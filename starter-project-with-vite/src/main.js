@@ -4,11 +4,14 @@ import { router } from './router.js';
 
 async function renderPage() {
 
-  const app = document.querySelector('#app');
+  const app =
+    document.querySelector('#app');
 
-  const url = window.location.hash.slice(1) || '/';
+  const url =
+    window.location.hash.slice(1) || '/';
 
-  const page = router[url];
+  const page =
+    router[url];
 
   if (!page) {
 
@@ -23,17 +26,20 @@ async function renderPage() {
 
   if (document.startViewTransition) {
 
-    document.startViewTransition(async () => {
+    document.startViewTransition(
+      async () => {
 
-      app.innerHTML = await page.render();
+        app.innerHTML =
+          await page.render();
 
-      await page.afterRender();
-
-    });
+        await page.afterRender();
+      }
+    );
 
   } else {
 
-    app.innerHTML = await page.render();
+    app.innerHTML =
+      await page.render();
 
     await page.afterRender();
   }
@@ -50,15 +56,13 @@ window.addEventListener(
 
     await renderPage();
 
-    // REGISTER SERVICE WORKER
     if ('serviceWorker' in navigator) {
 
       try {
 
-        const registration =
-          await navigator.serviceWorker.register(
-            '/story-app/sw.js'
-          );
+        await navigator.serviceWorker.register(
+          '/story-app/sw.js'
+        );
 
         console.log(
           'Service Worker registered'
