@@ -1,77 +1,29 @@
-export default class LoginPage {
+import { login } from '../../data/api.js';
+
+const LoginPage = {
+
   async render() {
+
     return `
-      <a href="#main-content" class="skip-link">
-        Skip to Content
-      </a>
+      <section class="container">
 
-      <header>
-        <div class="container main-header">
-
-          <a href="#/login" class="brand-name">
-            Story App
-          </a>
-
-          <nav class="navigation-drawer">
-            <ul class="nav-list">
-
-              <li>
-                <a href="#/login">
-                  Login
-                </a>
-              </li>
-
-              <li>
-                <a href="#/register">
-                  Register
-                </a>
-              </li>
-
-            </ul>
-          </nav>
-
-        </div>
-      </header>
-
-      <main
-        id="main-content"
-        class="main-content container"
-      >
         <h1>Login</h1>
 
         <form id="loginForm">
 
-          <div style="margin-bottom:16px;">
-            <label for="email">
-              Email
-            </label>
+          <input
+            type="email"
+            id="email"
+            placeholder="Email"
+            required
+          />
 
-            <input
-              type="email"
-              id="email"
-              required
-              style="
-                width:100%;
-                padding:10px;
-              "
-            >
-          </div>
-
-          <div style="margin-bottom:16px;">
-            <label for="password">
-              Password
-            </label>
-
-            <input
-              type="password"
-              id="password"
-              required
-              style="
-                width:100%;
-                padding:10px;
-              "
-            >
-          </div>
+          <input
+            type="password"
+            id="password"
+            placeholder="Password"
+            required
+          />
 
           <button type="submit">
             Login
@@ -79,75 +31,56 @@ export default class LoginPage {
 
         </form>
 
-        <p style="margin-top:20px;">
-          Belum punya akun?
-
-          <a href="#/register">
-            Register
-          </a>
-        </p>
-      </main>
-
-      <footer
-        style="
-          padding:20px;
-          text-align:center;
-        "
-      >
-        <p>Story App</p>
-      </footer>
+      </section>
     `;
-  }
+  },
 
   async afterRender() {
+
     const form =
-      document.getElementById(
-        'loginForm'
+      document.querySelector(
+        '#loginForm'
       );
 
     form.addEventListener(
       'submit',
-      async (e) => {
-        e.preventDefault();
+      async (event) => {
+
+        event.preventDefault();
 
         const email =
-          document.getElementById('email')
-            .value;
-
-        const password =
-          document.getElementById(
-            'password'
+          document.querySelector(
+            '#email'
           ).value;
 
-        const response = await fetch(
-          'https://story-api.dicoding.dev/v1/login',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type':
-                'application/json',
-            },
-            body: JSON.stringify({
-              email,
-              password,
-            }),
-          }
-        );
+        const password =
+          document.querySelector(
+            '#password'
+          ).value;
 
         const result =
-          await response.json();
+          await login(
+            email,
+            password
+          );
 
         if (!result.error) {
+
           localStorage.setItem(
             'token',
             result.loginResult.token
           );
 
-          location.hash = '/home';
+          window.location.hash =
+            '#/home';
+
         } else {
+
           alert(result.message);
         }
       }
     );
-  }
-}
+  },
+};
+
+export default LoginPage;

@@ -1,93 +1,36 @@
-export default class RegisterPage {
+import { register } from '../../data/api.js';
+
+const RegisterPage = {
+
   async render() {
+
     return `
-      <a href="#main-content" class="skip-link">
-        Skip to Content
-      </a>
+      <section class="container">
 
-      <header>
-        <div class="container main-header">
-
-          <a href="#/register" class="brand-name">
-            Story App
-          </a>
-
-          <nav class="navigation-drawer">
-            <ul class="nav-list">
-
-              <li>
-                <a href="#/login">
-                  Login
-                </a>
-              </li>
-
-              <li>
-                <a href="#/register">
-                  Register
-                </a>
-              </li>
-
-            </ul>
-          </nav>
-
-        </div>
-      </header>
-
-      <main
-        id="main-content"
-        class="main-content container"
-      >
         <h1>Register</h1>
 
         <form id="registerForm">
 
-          <div style="margin-bottom:16px;">
-            <label for="name">
-              Nama
-            </label>
+          <input
+            type="text"
+            id="name"
+            placeholder="Nama"
+            required
+          />
 
-            <input
-              type="text"
-              id="name"
-              required
-              style="
-                width:100%;
-                padding:10px;
-              "
-            >
-          </div>
+          <input
+            type="email"
+            id="email"
+            placeholder="Email"
+            required
+          />
 
-          <div style="margin-bottom:16px;">
-            <label for="email">
-              Email
-            </label>
-
-            <input
-              type="email"
-              id="email"
-              required
-              style="
-                width:100%;
-                padding:10px;
-              "
-            >
-          </div>
-
-          <div style="margin-bottom:16px;">
-            <label for="password">
-              Password
-            </label>
-
-            <input
-              type="password"
-              id="password"
-              required
-              style="
-                width:100%;
-                padding:10px;
-              "
-            >
-          </div>
+          <input
+            type="password"
+            id="password"
+            placeholder="Password"
+            required
+          />
 
           <button type="submit">
             Register
@@ -95,77 +38,61 @@ export default class RegisterPage {
 
         </form>
 
-        <p style="margin-top:20px;">
-          Sudah punya akun?
-
-          <a href="#/login">
-            Login
-          </a>
-        </p>
-      </main>
-
-      <footer
-        style="
-          padding:20px;
-          text-align:center;
-        "
-      >
-        <p>Story App</p>
-      </footer>
+      </section>
     `;
-  }
+  },
 
   async afterRender() {
+
     const form =
-      document.getElementById(
-        'registerForm'
+      document.querySelector(
+        '#registerForm'
       );
 
     form.addEventListener(
       'submit',
-      async (e) => {
-        e.preventDefault();
+      async (event) => {
+
+        event.preventDefault();
 
         const name =
-          document.getElementById('name')
-            .value;
-
-        const email =
-          document.getElementById('email')
-            .value;
-
-        const password =
-          document.getElementById(
-            'password'
+          document.querySelector(
+            '#name'
           ).value;
 
-        const response = await fetch(
-          'https://story-api.dicoding.dev/v1/register',
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type':
-                'application/json',
-            },
-            body: JSON.stringify({
-              name,
-              email,
-              password,
-            }),
-          }
-        );
+        const email =
+          document.querySelector(
+            '#email'
+          ).value;
+
+        const password =
+          document.querySelector(
+            '#password'
+          ).value;
 
         const result =
-          await response.json();
+          await register(
+            name,
+            email,
+            password
+          );
 
         if (!result.error) {
-          alert('Register berhasil');
 
-          location.hash = '/login';
+          alert(
+            'Register berhasil'
+          );
+
+          window.location.hash =
+            '#/login';
+
         } else {
+
           alert(result.message);
         }
       }
     );
-  }
-}
+  },
+};
+
+export default RegisterPage;
