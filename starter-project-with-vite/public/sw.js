@@ -1,59 +1,57 @@
 const CACHE_NAME = 'story-app-v1';
 
 const urlsToCache = [
-  '/',
-  '/manifest.json',
-  '/favicon.png',
+  '/story-app/',
+  '/story-app/index.html',
 ];
 
-// INSTALL
-self.addEventListener('install', (event) => {
-  console.log('Service Worker Installed');
+self.addEventListener(
+  'install',
+  (event) => {
 
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(urlsToCache);
-    })
-  );
-});
+    console.log(
+      'Service Worker Installed'
+    );
 
-// FETCH
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then(
-      (response) => {
-        return (
-          response ||
-          fetch(event.request)
-        );
-      }
-    )
-  );
-});
-
-// PUSH
-self.addEventListener('push', (event) => {
-  console.log(
-    'Push notification received'
-  );
-
-  let notificationData = {
-    title: 'Story App',
-    options: {
-      body: 'Ada story baru',
-    },
-  };
-
-  if (event.data) {
-    notificationData = JSON.parse(
-      event.data.text()
+    event.waitUntil(
+      caches.open(CACHE_NAME)
+        .then((cache) => {
+          return cache.addAll(
+            urlsToCache
+          );
+        })
     );
   }
+);
 
-  event.waitUntil(
+self.addEventListener(
+  'fetch',
+  (event) => {
+
+    event.respondWith(
+      caches.match(event.request)
+        .then((response) => {
+
+          return (
+            response ||
+            fetch(event.request)
+          );
+        })
+    );
+  }
+);
+
+self.addEventListener(
+  'push',
+  (event) => {
+
+    const data = event.data.json();
+
     self.registration.showNotification(
-      notificationData.title,
-      notificationData.options
-    )
-  );
-});
+      data.title,
+      {
+        body: data.options.body,
+      }
+    );
+  }
+);

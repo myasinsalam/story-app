@@ -2,29 +2,72 @@ import './styles/styles.css';
 
 import { router } from './router.js';
 
-router();
+async function renderPage() {
 
-// REGISTER SERVICE WORKER
-if ('serviceWorker' in navigator) {
-  window.addEventListener(
-    'load',
-    async () => {
+  const app = document.querySelector('#app');
+
+  const url = window.location.hash.slice(1) || '/';
+
+  const page = router[url];
+
+  if (!page) {
+
+    app.innerHTML = `
+      <section class="container">
+        <h1>404 Page Not Found</h1>
+      </section>
+    `;
+
+    return;
+  }
+
+  if (document.startViewTransition) {
+
+    document.startViewTransition(async () => {
+
+      app.innerHTML = await page.render();
+
+      await page.afterRender();
+
+    });
+
+  } else {
+
+    app.innerHTML = await page.render();
+
+    await page.afterRender();
+  }
+}
+
+window.addEventListener(
+  'hashchange',
+  renderPage
+);
+
+window.addEventListener(
+  'load',
+  async () => {
+
+    await renderPage();
+
+    // REGISTER SERVICE WORKER
+    if ('serviceWorker' in navigator) {
+
       try {
+
         const registration =
           await navigator.serviceWorker.register(
-            '/sw.js'
+            '/story-app/sw.js'
           );
 
         console.log(
           'Service Worker registered'
         );
 
-        // REQUEST NOTIFICATION
-        await Notification.requestPermission();
-
       } catch (error) {
+
         console.error(error);
       }
     }
-  );
-}
+  }
+);
