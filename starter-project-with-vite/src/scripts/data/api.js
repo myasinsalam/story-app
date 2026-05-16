@@ -1,24 +1,87 @@
-// import CONFIG from '../config';
+const BASE_URL =
+  'https://story-api.dicoding.dev/v1';
 
-// const ENDPOINTS = {
-//   ENDPOINT: `${CONFIG.BASE_URL}/your/endpoint/here`,
-// };
+export async function register(
+  name,
+  email,
+  password
+) {
 
-// export async function getData() {
-//   const fetchResponse = await fetch(ENDPOINTS.ENDPOINT);
-//   return await fetchResponse.json();
-// }
-const BASE_URL = 'https://story-api.dicoding.dev/v1';
+  const response = await fetch(
+    `${BASE_URL}/register`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type':
+          'application/json',
+      },
+      body: JSON.stringify({
+        name,
+        email,
+        password,
+      }),
+    }
+  );
 
-export async function getStories() {
-  const token = localStorage.getItem('token');
+  return response.json();
+}
 
-  const response = await fetch(`${BASE_URL}/stories`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+export async function login(
+  email,
+  password
+) {
 
-  const result = await response.json();
-  return result.listStory;
+  const response = await fetch(
+    `${BASE_URL}/login`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type':
+          'application/json',
+      },
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+    }
+  );
+
+  return response.json();
+}
+
+export async function getStories(
+  token
+) {
+
+  const response = await fetch(
+    `${BASE_URL}/stories`,
+    {
+      headers: {
+        Authorization:
+          `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.json();
+}
+
+export async function addStory(
+  formData,
+  token
+) {
+
+  const response = await fetch(
+    `${BASE_URL}/stories`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization:
+          `Bearer ${token}`,
+      },
+      body: formData,
+    }
+  );
+
+  return response.json();
 }
