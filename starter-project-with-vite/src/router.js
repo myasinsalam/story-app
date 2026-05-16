@@ -1,43 +1,20 @@
-import Login from './scripts/pages/login/login-page.js';
-import Register from './scripts/pages/register/register-page.js';
-import Home from './scripts/pages/home/home-page.js';
-import AddStory from './scripts/pages/add-story/add-story-page.js';
+import HomePage from './scripts/pages/home/home-page.js';
 
-import { transition } from './scripts/utils/transition.js';
+import LoginPage from './scripts/pages/login/login-page.js';
 
-const routes = {
-  '/login': Login,
-  '/register': Register,
-  '/home': Home,
-  '/add-story': AddStory,
+import RegisterPage from './scripts/pages/register/register-page.js';
+
+import AddStoryPage from './scripts/pages/add-story/add-story-page.js';
+
+export const router = {
+
+  '/': LoginPage,
+
+  '/login': LoginPage,
+
+  '/register': RegisterPage,
+
+  '/home': HomePage,
+
+  '/add-story': AddStoryPage,
 };
-
-export async function router() {
-  const app = document.querySelector('#app');
-
-  const path = location.hash.slice(1) || '/login';
-
-  const PageClass = routes[path];
-
-  if (!PageClass) {
-    app.innerHTML = `
-      <main>
-        <h1>404 Page Not Found</h1>
-      </main>
-    `;
-    return;
-  }
-
-  const page = new PageClass();
-
-  transition(async () => {
-    app.innerHTML = await page.render();
-
-    if (page.afterRender) {
-      await page.afterRender();
-    }
-  });
-}
-
-window.addEventListener('load', router);
-window.addEventListener('hashchange', router);
