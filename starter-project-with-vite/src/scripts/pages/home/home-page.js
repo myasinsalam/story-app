@@ -1,5 +1,18 @@
 import L from 'leaflet';
+
 import 'leaflet/dist/leaflet.css';
+
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+});
 
 import { getStories } from '../../data/api.js';
 
@@ -10,12 +23,17 @@ import {
 } from '../../data/indexeddb.js';
 
 const HomePage = {
+
   async render() {
+
     return `
       <section class="container">
 
         <div class="home-header">
-          <h1>Daftar Story</h1>
+
+          <h1>
+            Daftar Story
+          </h1>
 
           <button
             id="logoutButton"
@@ -23,18 +41,23 @@ const HomePage = {
           >
             Logout
           </button>
+
         </div>
 
         <div
           id="map"
           style="
-            height: 400px;
+            height:400px;
             border-radius:16px;
             margin-bottom:24px;
           "
         ></div>
 
-        <h2 style="margin-bottom:16px;">
+        <h2
+          style="
+            margin-bottom:16px;
+          "
+        >
           Story API
         </h2>
 
@@ -62,12 +85,17 @@ const HomePage = {
   },
 
   async afterRender() {
+
     const token =
-      localStorage.getItem('token');
+      localStorage.getItem(
+        'token'
+      );
 
     if (!token) {
+
       window.location.hash =
         '#/login';
+
       return;
     }
 
@@ -107,9 +135,13 @@ const HomePage = {
       const stories =
         result.listStory || [];
 
-      // MAP
+      /* MAP */
+
       const map = L.map('map')
-        .setView([-2.5, 118], 5);
+        .setView(
+          [-2.5, 118],
+          5
+        );
 
       L.tileLayer(
         'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -119,42 +151,51 @@ const HomePage = {
         }
       ).addTo(map);
 
-      // MARKER
+      /* MARKER */
+
       stories.forEach((story) => {
 
-        if (story.lat && story.lon) {
+        if (
+          story.lat &&
+          story.lon
+        ) {
 
           L.marker([
             story.lat,
             story.lon,
           ])
-            .addTo(map)
-            .bindPopup(`
-              <img
-                src="${story.photoUrl}"
-                alt="${story.name}"
-                width="120"
-                style="
-                  border-radius:8px;
-                  margin-bottom:8px;
-                "
-              />
+          .addTo(map)
+          .bindPopup(`
+            <img
+              src="${story.photoUrl}"
+              alt="${story.name}"
+              width="120"
+              style="
+                border-radius:8px;
+                margin-bottom:8px;
+              "
+            />
 
-              <br>
+            <br>
 
-              <b>${story.name}</b>
+            <b>
+              ${story.name}
+            </b>
 
-              <br>
+            <br>
 
-              ${story.description}
-            `);
+            ${story.description}
+          `);
         }
       });
 
-      // STORY API
+      /* STORY API */
+
       storiesList.innerHTML =
         stories.map((story) => `
-          <article class="story-card">
+          <article
+            class="story-card"
+          >
 
             <img
               src="${story.photoUrl}"
@@ -162,17 +203,24 @@ const HomePage = {
               class="story-image"
             />
 
-            <div class="story-content">
+            <div
+              class="story-content"
+            >
 
-              <h2>${story.name}</h2>
+              <h2>
+                ${story.name}
+              </h2>
 
               <p>
                 ${story.description}
               </p>
 
-              <div class="story-actions">
+              <div
+                class="story-actions"
+              >
 
                 <button
+                  type="button"
                   class="save-button"
                   data-id="${story.id}"
                 >
@@ -186,7 +234,8 @@ const HomePage = {
           </article>
         `).join('');
 
-      // SAVE BUTTON
+      /* SAVE BUTTON */
+
       document
         .querySelectorAll(
           '.save-button'
@@ -204,7 +253,9 @@ const HomePage = {
                     button.dataset.id
                 );
 
-              await saveStory(story);
+              await saveStory(
+                story
+              );
 
               alert(
                 'Story berhasil disimpan'
@@ -215,13 +266,16 @@ const HomePage = {
           );
         });
 
-      // LOAD SAVED STORIES
+      /* SAVED STORIES */
+
       const savedStories =
         await getAllStories();
 
       savedStoriesContainer.innerHTML =
         savedStories.map((story) => `
-          <article class="story-card">
+          <article
+            class="story-card"
+          >
 
             <img
               src="${story.photoUrl}"
@@ -229,17 +283,24 @@ const HomePage = {
               class="story-image"
             />
 
-            <div class="story-content">
+            <div
+              class="story-content"
+            >
 
-              <h2>${story.name}</h2>
+              <h2>
+                ${story.name}
+              </h2>
 
               <p>
                 ${story.description}
               </p>
 
-              <div class="story-actions">
+              <div
+                class="story-actions"
+              >
 
                 <button
+                  type="button"
                   class="delete-button"
                   data-id="${story.id}"
                 >
@@ -253,7 +314,8 @@ const HomePage = {
           </article>
         `).join('');
 
-      // DELETE BUTTON
+      /* DELETE BUTTON */
+
       document
         .querySelectorAll(
           '.delete-button'
