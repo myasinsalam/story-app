@@ -2,13 +2,71 @@ import './styles/styles.css';
 
 import { router } from './router.js';
 
+async function registerServiceWorker() {
+
+  if (
+    'serviceWorker' in navigator
+  ) {
+
+    try {
+
+      await navigator.serviceWorker.register(
+        './sw.js'
+      );
+
+      console.log(
+        'Service Worker registered'
+      );
+
+      await Notification.requestPermission();
+
+    } catch (error) {
+
+      console.error(error);
+    }
+  }
+}
+
+function handleHeaderVisibility() {
+
+  const hash =
+    window.location.hash;
+
+  const header =
+    document.querySelector(
+      '#appHeader'
+    );
+
+  if (
+    hash === '#/login' ||
+    hash === '#/register' ||
+    hash === ''
+  ) {
+
+    header.style.display =
+      'none';
+
+  } else {
+
+    header.style.display =
+      'block';
+  }
+}
+
 async function renderPage() {
 
+  handleHeaderVisibility();
+
   const app =
-    document.querySelector('#app');
+    document.querySelector(
+      '#main-content'
+    );
+
+  const hash =
+    window.location.hash.slice(1);
 
   const url =
-    window.location.hash.slice(1) || '/';
+    hash || '/login';
 
   const page =
     router[url];
@@ -16,32 +74,34 @@ async function renderPage() {
   if (!page) {
 
     app.innerHTML = `
-      <section class="container">
-        <h1>404 Page Not Found</h1>
-      </section>
+      <h1>
+        404 Page Not Found
+      </h1>
     `;
 
     return;
   }
 
-  if (document.startViewTransition) {
+  const renderContent =
+    async () => {
+
+      app.innerHTML =
+        await page.render();
+
+      await page.afterRender();
+    };
+
+  if (
+    document.startViewTransition
+  ) {
 
     document.startViewTransition(
-      async () => {
-
-        app.innerHTML =
-          await page.render();
-
-        await page.afterRender();
-      }
+      renderContent
     );
 
   } else {
 
-    app.innerHTML =
-      await page.render();
-
-    await page.afterRender();
+    await renderContent();
   }
 }
 
@@ -54,24 +114,8 @@ window.addEventListener(
   'load',
   async () => {
 
+    await registerServiceWorker();
+
     await renderPage();
-
-    if ('serviceWorker' in navigator) {
-
-      try {
-
-        await navigator.serviceWorker.register(
-          '/story-app/sw.js'
-        );
-
-        console.log(
-          'Service Worker registered'
-        );
-
-      } catch (error) {
-
-        console.error(error);
-      }
-    }
   }
 );

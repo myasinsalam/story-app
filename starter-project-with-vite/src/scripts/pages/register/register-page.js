@@ -7,28 +7,39 @@ const RegisterPage = {
     return `
       <section class="container">
 
-        <h1>Register</h1>
+        <h1 style="margin-bottom:20px;">
+          Register
+        </h1>
 
         <form id="registerForm">
+
+          <label for="name">
+            Nama
+          </label>
 
           <input
             type="text"
             id="name"
-            placeholder="Nama"
             required
           />
+
+          <label for="email">
+            Email
+          </label>
 
           <input
             type="email"
             id="email"
-            placeholder="Email"
             required
           />
+
+          <label for="password">
+            Password
+          </label>
 
           <input
             type="password"
             id="password"
-            placeholder="Password"
             required
           />
 
@@ -37,6 +48,16 @@ const RegisterPage = {
           </button>
 
         </form>
+
+        <p style="margin-top:16px;">
+
+          Sudah punya akun?
+
+          <a href="#/login">
+            Login
+          </a>
+
+        </p>
 
       </section>
     `;
@@ -55,40 +76,53 @@ const RegisterPage = {
 
         event.preventDefault();
 
-        const name =
-          document.querySelector(
-            '#name'
-          ).value;
+        try {
 
-        const email =
-          document.querySelector(
-            '#email'
-          ).value;
+          const name =
+            document.querySelector(
+              '#name'
+            ).value;
 
-        const password =
-          document.querySelector(
-            '#password'
-          ).value;
+          const email =
+            document.querySelector(
+              '#email'
+            ).value;
 
-        const result =
-          await register(
-            name,
-            email,
-            password
-          );
+          const password =
+            document.querySelector(
+              '#password'
+            ).value;
 
-        if (!result.error) {
+          const result =
+            await register(
+              name,
+              email,
+              password
+            );
+
+          if (!result.error) {
+
+            alert(
+              'Register berhasil'
+            );
+
+            window.location.hash =
+              '#/login';
+
+          } else {
+
+            alert(
+              result.message
+            );
+          }
+
+        } catch (error) {
+
+          console.error(error);
 
           alert(
-            'Register berhasil'
+            'Register gagal'
           );
-
-          window.location.hash =
-            '#/login';
-
-        } else {
-
-          alert(result.message);
         }
       }
     );

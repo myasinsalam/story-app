@@ -7,21 +7,29 @@ const LoginPage = {
     return `
       <section class="container">
 
-        <h1>Login</h1>
+        <h1 style="margin-bottom:20px;">
+          Login
+        </h1>
 
         <form id="loginForm">
+
+          <label for="email">
+            Email
+          </label>
 
           <input
             type="email"
             id="email"
-            placeholder="Email"
             required
           />
+
+          <label for="password">
+            Password
+          </label>
 
           <input
             type="password"
             id="password"
-            placeholder="Password"
             required
           />
 
@@ -30,6 +38,16 @@ const LoginPage = {
           </button>
 
         </form>
+
+        <p style="margin-top:16px;">
+
+          Belum punya akun?
+
+          <a href="#/register">
+            Register
+          </a>
+
+        </p>
 
       </section>
     `;
@@ -48,35 +66,52 @@ const LoginPage = {
 
         event.preventDefault();
 
-        const email =
-          document.querySelector(
-            '#email'
-          ).value;
+        try {
 
-        const password =
-          document.querySelector(
-            '#password'
-          ).value;
+          const email =
+            document.querySelector(
+              '#email'
+            ).value;
 
-        const result =
-          await login(
-            email,
-            password
+          const password =
+            document.querySelector(
+              '#password'
+            ).value;
+
+          const result =
+            await login(
+              email,
+              password
+            );
+
+          if (!result.error) {
+
+            localStorage.setItem(
+              'token',
+              result.loginResult.token
+            );
+
+            alert(
+              'Login berhasil'
+            );
+
+            window.location.hash =
+              '#/home';
+
+          } else {
+
+            alert(
+              result.message
+            );
+          }
+
+        } catch (error) {
+
+          console.error(error);
+
+          alert(
+            'Login gagal'
           );
-
-        if (!result.error) {
-
-          localStorage.setItem(
-            'token',
-            result.loginResult.token
-          );
-
-          window.location.hash =
-            '#/home';
-
-        } else {
-
-          alert(result.message);
         }
       }
     );

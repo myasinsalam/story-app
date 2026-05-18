@@ -1,49 +1,98 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
+<html lang="id">
 
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0"
-    />
+<head>
 
-    <meta
-      name="theme-color"
-      content="#1976d2"
-    />
+  <meta charset="UTF-8" />
 
-    <title>Story App</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
 
-    <!-- MANIFEST -->
-    <link
-      rel="manifest"
-      href="/manifest.json"
-    />
+  <title>Story App</title>
 
-    <!-- FAVICON -->
-    <link
-      rel="icon"
-      href="/favicon.png"
-    />
+  <link
+    rel="manifest"
+    href="./manifest.json"
+  />
 
-    <!-- LEAFLET CSS -->
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    />
-  </head>
+  <meta
+    name="theme-color"
+    content="#1976d2"
+  />
 
-  <body>
-    <div id="app"></div>
+  <link
+    rel="icon"
+    href="./favicon.png"
+  />
 
-    <!-- MAIN JS -->
-    <script
-      type="module"
-      src="/src/main.js"
-    ></script>
+</head>
 
-    <!-- LEAFLET -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  </body>
+<body>
+
+  <a
+    href="#main-content"
+    class="skip-link"
+  >
+    Skip to content
+  </a>
+
+  <header id="appHeader">
+
+    <div class="container main-header">
+
+      <a
+        href="#/home"
+        class="brand-name"
+      >
+        Story App
+      </a>
+
+      <nav
+        class="navigation-drawer"
+      >
+
+        <ul class="nav-list">
+
+          <li>
+            <a href="#/home">
+              Home
+            </a>
+          </li>
+
+          <li>
+            <a href="#/add-story">
+              Add Story
+            </a>
+          </li>
+
+        </ul>
+
+      </nav>
+
+    </div>
+
+  </header>
+
+  <main
+    id="main-content"
+    class="main-content"
+  ></main>
+
+  <footer>
+
+    <p>
+      Story App Dicoding
+    </p>
+
+  </footer>
+
+  <script
+    type="module"
+    src="/src/main.js"
+  ></script>
+
+</body>
+
 </html>
