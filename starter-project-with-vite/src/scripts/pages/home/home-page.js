@@ -176,7 +176,7 @@ const HomePage = {
                 class="save-btn"
                 data-id="${story.id}"
               >
-                Simpan
+                Bookmark
               </button>
 
             </div>
@@ -233,7 +233,7 @@ const HomePage = {
             );
 
             alert(
-              'Story disimpan'
+              'Bookmark berhasil disimpan'
             );
 
             loadBookmarks();
@@ -296,7 +296,7 @@ const HomePage = {
                   class="delete-btn"
                   data-id="${story.id}"
                 >
-                  Hapus
+                  Hapus Bookmark
                 </button>
 
               </div>
@@ -327,7 +327,7 @@ const HomePage = {
               );
 
               alert(
-                'Bookmark dihapus'
+                'Bookmark berhasil dihapus'
               );
 
               loadBookmarks();
