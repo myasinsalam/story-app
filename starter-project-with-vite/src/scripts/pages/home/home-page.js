@@ -6,14 +6,6 @@ import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
-delete L.Icon.Default.prototype._getIconUrl;
-
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: markerIcon2x,
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
-});
-
 import { getStories } from '../../data/api.js';
 
 import {
@@ -21,6 +13,14 @@ import {
   getAllStories,
   deleteStory,
 } from '../../data/indexeddb.js';
+
+delete L.Icon.Default.prototype._getIconUrl;
+
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+});
 
 const HomePage = {
 
@@ -31,16 +31,30 @@ const HomePage = {
 
         <div class="home-header">
 
-          <h1>
-            Daftar Story
-          </h1>
+          <h1>Daftar Story</h1>
 
-          <button
-            id="logoutButton"
-            class="button"
+          <div
+            style="
+              display:flex;
+              gap:12px;
+            "
           >
-            Logout
-          </button>
+
+            <a
+              href="#/add-story"
+              class="button"
+            >
+              Add Story
+            </a>
+
+            <button
+              id="logoutButton"
+              class="button"
+            >
+              Logout
+            </button>
+
+          </div>
 
         </div>
 
@@ -48,8 +62,8 @@ const HomePage = {
           id="map"
           style="
             height:400px;
-            border-radius:16px;
             margin-bottom:24px;
+            border-radius:16px;
           "
         ></div>
 
@@ -69,11 +83,20 @@ const HomePage = {
         <h2
           style="
             margin-top:40px;
+            margin-bottom:8px;
+          "
+        >
+          Bookmark Story
+        </h2>
+
+        <p
+          style="
             margin-bottom:16px;
           "
         >
-          Story Tersimpan
-        </h2>
+          Story yang disimpan pengguna
+          menggunakan IndexedDB.
+        </p>
 
         <div
           id="savedStories"
@@ -137,8 +160,8 @@ const HomePage = {
 
       /* MAP */
 
-      const map = L.map('map')
-        .setView(
+      const map =
+        L.map('map').setView(
           [-2.5, 118],
           5
         );
@@ -189,7 +212,7 @@ const HomePage = {
         }
       });
 
-      /* STORY API */
+      /* STORY LIST */
 
       storiesList.innerHTML =
         stories.map((story) => `
@@ -215,26 +238,19 @@ const HomePage = {
                 ${story.description}
               </p>
 
-              <div
-                class="story-actions"
+              <button
+                class="save-button"
+                data-id="${story.id}"
               >
-
-                <button
-                  type="button"
-                  class="save-button"
-                  data-id="${story.id}"
-                >
-                  Save
-                </button>
-
-              </div>
+                Simpan ke Bookmark
+              </button>
 
             </div>
 
           </article>
         `).join('');
 
-      /* SAVE BUTTON */
+      /* SAVE STORY */
 
       document
         .querySelectorAll(
@@ -266,7 +282,7 @@ const HomePage = {
           );
         });
 
-      /* SAVED STORIES */
+      /* GET SAVED STORIES */
 
       const savedStories =
         await getAllStories();
@@ -295,26 +311,19 @@ const HomePage = {
                 ${story.description}
               </p>
 
-              <div
-                class="story-actions"
+              <button
+                class="delete-button"
+                data-id="${story.id}"
               >
-
-                <button
-                  type="button"
-                  class="delete-button"
-                  data-id="${story.id}"
-                >
-                  Delete
-                </button>
-
-              </div>
+                Hapus Bookmark
+              </button>
 
             </div>
 
           </article>
         `).join('');
 
-      /* DELETE BUTTON */
+      /* DELETE STORY */
 
       document
         .querySelectorAll(
@@ -345,7 +354,7 @@ const HomePage = {
 
       storiesList.innerHTML = `
         <p>
-          Gagal memuat data story
+          Gagal memuat story
         </p>
       `;
     }

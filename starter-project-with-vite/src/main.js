@@ -1,121 +1,131 @@
 import './styles/styles.css';
 
-import { router } from './router.js';
+import App from './scripts/pages/app.js';
+
+import {
+  subscribeNotification,
+} from './scripts/data/api.js';
+
+const VAPID_PUBLIC_KEY =
+  'ISI_VAPID_KEY_ASLI';
+
+function urlBase64ToUint8Array(
+  base64String
+) {
+
+  const padding =
+    '='.repeat(
+      (4 - base64String.length % 4) % 4
+    );
+
+  const base64 =
+    (base64String + padding)
+      .replace(/-/g, '+')
+      .replace(/_/g, '/');
+
+  const rawData =
+    window.atob(base64);
+
+  return Uint8Array.from(
+    [...rawData].map(
+      (char) =>
+        char.charCodeAt(0)
+    )
+  );
+}
 
 async function registerServiceWorker() {
 
   if (
-    'serviceWorker' in navigator
+    !('serviceWorker' in navigator)
   ) {
-
-    try {
-
-      await navigator.serviceWorker.register(
-        './sw.js'
-      );
-
-      console.log(
-        'Service Worker registered'
-      );
-
-      await Notification.requestPermission();
-
-    } catch (error) {
-
-      console.error(error);
-    }
-  }
-}
-
-function handleHeaderVisibility() {
-
-  const hash =
-    window.location.hash;
-
-  const header =
-    document.querySelector(
-      '#appHeader'
-    );
-
-  if (
-    hash === '#/login' ||
-    hash === '#/register' ||
-    hash === ''
-  ) {
-
-    header.style.display =
-      'none';
-
-  } else {
-
-    header.style.display =
-      'block';
-  }
-}
-
-async function renderPage() {
-
-  handleHeaderVisibility();
-
-  const app =
-    document.querySelector(
-      '#main-content'
-    );
-
-  const hash =
-    window.location.hash.slice(1);
-
-  const url =
-    hash || '/login';
-
-  const page =
-    router[url];
-
-  if (!page) {
-
-    app.innerHTML = `
-      <h1>
-        404 Page Not Found
-      </h1>
-    `;
-
     return;
   }
 
-  const renderContent =
-    async () => {
+  try {
 
-      app.innerHTML =
-        await page.render();
+    const registration =
+      await navigator.serviceWorker.register(
+        '/story-app/sw.js'
+      );
 
-      await page.afterRender();
-    };
-
-  if (
-    document.startViewTransition
-  ) {
-
-    document.startViewTransition(
-      renderContent
+    console.log(
+      'Service Worker registered'
     );
 
-  } else {
+    const permission =
+      await Notification.requestPermission();
 
-    await renderContent();
+    if (
+      permission !== 'granted'
+    ) {
+      return;
+    }
+
+    const subscription =
+      await registration.pushManager.subscribe(
+        {
+          userVisibleOnly: true,
+          applicationServerKey:
+            urlBase64ToUint8Array(
+              VAPID_PUBLIC_KEY
+            ),
+        }
+      );
+
+    const token =
+      localStorage.getItem(
+        'token'
+      );
+
+    if (token) {
+
+      await subscribeNotification(
+        {
+          endpoint:
+            subscription.endpoint,
+          keys: {
+            p256dh:
+              subscription.toJSON().keys.p256dh,
+            auth:
+              subscription.toJSON().keys.auth,
+          },
+        },
+        token
+      );
+
+      console.log(
+        'Push subscribed'
+      );
+    }
+
+  } catch (error) {
+
+    console.error(error);
   }
 }
 
+const app = new App({
+  content:
+    document.querySelector(
+      '#mainContent'
+    ),
+});
+
 window.addEventListener(
   'hashchange',
-  renderPage
+  async () => {
+
+    await app.renderPage();
+  }
 );
 
 window.addEventListener(
   'load',
   async () => {
 
-    await registerServiceWorker();
+    await app.renderPage();
 
-    await renderPage();
+    await registerServiceWorker();
   }
 );
