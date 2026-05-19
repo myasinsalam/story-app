@@ -12,10 +12,13 @@ class App {
 
   async renderPage() {
 
-    const url =
+    const hash =
       window.location.hash
         .slice(1)
-        .toLowerCase() || '/';
+        .toLowerCase();
+
+    const url =
+      hash || '/';
 
     const page =
       routes[url];
