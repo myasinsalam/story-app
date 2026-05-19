@@ -1,57 +1,67 @@
-import { register } from '../../data/api.js';
+import {
+  register,
+} from '../../data/api.js';
 
 const RegisterPage = {
 
   async render() {
 
     return `
-      <section class="container">
+      <section class="auth-container">
 
-        <h1>Register</h1>
+        <h1>
+          Register
+        </h1>
 
         <form id="registerForm">
 
-          <div>
-            <label for="name">
-              Nama
-            </label>
+          <label for="name">
+            Nama
+          </label>
 
-            <input
-              id="name"
-              type="text"
-              required
-            />
-          </div>
+          <input
+            id="name"
+            type="text"
+            required
+          />
 
-          <div>
-            <label for="email">
-              Email
-            </label>
+          <label for="email">
+            Email
+          </label>
 
-            <input
-              id="email"
-              type="email"
-              required
-            />
-          </div>
+          <input
+            id="email"
+            type="email"
+            required
+          />
 
-          <div>
-            <label for="password">
-              Password
-            </label>
+          <label for="password">
+            Password
+          </label>
 
-            <input
-              id="password"
-              type="password"
-              required
-            />
-          </div>
+          <input
+            id="password"
+            type="password"
+            required
+          />
 
           <button type="submit">
             Register
           </button>
 
         </form>
+
+        <p
+          style="
+            margin-top:16px;
+          "
+        >
+          Sudah punya akun?
+
+          <a href="#/login">
+            Login di sini
+          </a>
+        </p>
 
       </section>
     `;
@@ -85,27 +95,19 @@ const RegisterPage = {
             'password'
           ).value;
 
-        const result =
+        const response =
           await register(
             name,
             email,
             password
           );
 
-        if (!result.error) {
+        alert(
+          response.message
+        );
 
-          alert(
-            'Register berhasil'
-          );
-
-          window.location.hash =
-            '#/login';
-        } else {
-
-          alert(
-            result.message
-          );
-        }
+        window.location.hash =
+          '#/login';
       }
     );
   },

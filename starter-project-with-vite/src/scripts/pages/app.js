@@ -31,8 +31,6 @@ class App {
       return;
     }
 
-    /* VIEW TRANSITION */
-
     if (
       document.startViewTransition
     ) {

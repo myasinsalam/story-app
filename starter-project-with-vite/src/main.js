@@ -4,10 +4,11 @@ import App from './scripts/pages/app.js';
 
 import {
   subscribeNotification,
+  unsubscribeNotification,
 } from './scripts/data/api.js';
 
 const VAPID_PUBLIC_KEY =
-  'BCCs2eonMI-6H2ctvFaWg-UYdDv387Vno_bzUzALpB442r2lCnsHmtrx8biyPi_E-1fSGABK_Qs_GlvPoJJqxbk';
+  'PASTE_VAPID_KEY_ASLI_DICODING';
 
 function urlBase64ToUint8Array(
   base64String
@@ -201,6 +202,16 @@ window.addEventListener(
         await registration.pushManager.getSubscription();
 
       if (subscription) {
+
+        const token =
+          localStorage.getItem(
+            'token'
+          );
+
+        await unsubscribeNotification(
+          subscription.endpoint,
+          token
+        );
 
         await subscription.unsubscribe();
 

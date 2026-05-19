@@ -12,10 +12,12 @@ export async function register(
       `${BASE_URL}/register`,
       {
         method: 'POST',
+
         headers: {
           'Content-Type':
             'application/json',
         },
+
         body: JSON.stringify({
           name,
           email,
@@ -37,10 +39,12 @@ export async function login(
       `${BASE_URL}/login`,
       {
         method: 'POST',
+
         headers: {
           'Content-Type':
             'application/json',
         },
+
         body: JSON.stringify({
           email,
           password,
@@ -79,10 +83,12 @@ export async function addStory(
       `${BASE_URL}/stories`,
       {
         method: 'POST',
+
         headers: {
           Authorization:
             `Bearer ${token}`,
         },
+
         body: formData,
       }
     );
@@ -100,13 +106,46 @@ export async function subscribeNotification(
       `${BASE_URL}/notifications/subscribe`,
       {
         method: 'POST',
+
         headers: {
           'Content-Type':
             'application/json',
+
           Authorization:
             `Bearer ${token}`,
         },
-        body: JSON.stringify(subscription),
+
+        body: JSON.stringify(
+          subscription
+        ),
+      }
+    );
+
+  return response.json();
+}
+
+export async function unsubscribeNotification(
+  endpoint,
+  token
+) {
+
+  const response =
+    await fetch(
+      `${BASE_URL}/notifications/subscribe`,
+      {
+        method: 'DELETE',
+
+        headers: {
+          'Content-Type':
+            'application/json',
+
+          Authorization:
+            `Bearer ${token}`,
+        },
+
+        body: JSON.stringify({
+          endpoint,
+        }),
       }
     );
 
