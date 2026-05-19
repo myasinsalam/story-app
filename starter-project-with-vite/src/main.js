@@ -7,9 +7,7 @@ import {
 } from './scripts/data/api.js';
 
 const VAPID_PUBLIC_KEY =
-  'BCCs2eonMI-6H2ctvFaWg-UYdDv387Vno_bzUzALpB442r2lCnsHmtrx8biyPi_E-1fSGABK_Qs_GlvPoJJqxbk';
-
-/* BASE64 */
+  'MASUKKAN_VAPID_KEY_ASLI_DARI_DICODING';
 
 function urlBase64ToUint8Array(
   base64String
@@ -36,8 +34,6 @@ function urlBase64ToUint8Array(
   );
 }
 
-/* SERVICE WORKER */
-
 async function registerServiceWorker() {
 
   if (
@@ -53,66 +49,59 @@ async function registerServiceWorker() {
         '/story-app/sw.js'
       );
 
-    console.log(
-      'Service Worker registered'
-    );
-
     const permission =
       await Notification.requestPermission();
 
     if (
       permission !== 'granted'
     ) {
-
       return;
     }
 
     let subscription =
       await registration.pushManager.getSubscription();
 
-    if (subscription) {
+    if (!subscription) {
 
-      await subscription.unsubscribe();
-    }
+      subscription =
+        await registration.pushManager.subscribe(
+          {
+            userVisibleOnly: true,
 
-    subscription =
-      await registration.pushManager.subscribe(
-        {
-          userVisibleOnly: true,
+            applicationServerKey:
+              urlBase64ToUint8Array(
+                VAPID_PUBLIC_KEY
+              ),
+          }
+        );
 
-          applicationServerKey:
-            urlBase64ToUint8Array(
-              VAPID_PUBLIC_KEY
-            ),
-        }
-      );
+      const token =
+        localStorage.getItem(
+          'token'
+        );
 
-    const token =
-      localStorage.getItem(
-        'token'
-      );
+      if (token) {
 
-    if (token) {
+        await subscribeNotification(
+          {
+            endpoint:
+              subscription.endpoint,
 
-      await subscribeNotification(
-        {
-          endpoint:
-            subscription.endpoint,
+            keys: {
+              p256dh:
+                subscription.toJSON().keys.p256dh,
 
-          keys: {
-            p256dh:
-              subscription.toJSON().keys.p256dh,
-
-            auth:
-              subscription.toJSON().keys.auth,
+              auth:
+                subscription.toJSON().keys.auth,
+            },
           },
-        },
-        token
-      );
+          token
+        );
 
-      console.log(
-        'Push subscribed'
-      );
+        alert(
+          'Berhasil subscribe notification'
+        );
+      }
     }
 
   } catch (error) {
@@ -123,16 +112,12 @@ async function registerServiceWorker() {
   }
 }
 
-/* APP */
-
 const app = new App({
   content:
     document.querySelector(
       '#mainContent'
     ),
 });
-
-/* NAVBAR LOGIN REGISTER */
 
 function updateNavbar() {
 
@@ -159,8 +144,6 @@ function updateNavbar() {
   }
 }
 
-/* ROUTE */
-
 window.addEventListener(
   'hashchange',
   async () => {
@@ -171,8 +154,6 @@ window.addEventListener(
   }
 );
 
-/* LOAD */
-
 window.addEventListener(
   'load',
   async () => {
@@ -180,16 +161,12 @@ window.addEventListener(
     updateNavbar();
 
     await app.renderPage();
-
-    await registerServiceWorker();
   }
 );
 
-/* LOGOUT */
-
 window.addEventListener(
   'click',
-  (event) => {
+  async (event) => {
 
     if (
       event.target.id ===
@@ -202,6 +179,35 @@ window.addEventListener(
 
       window.location.hash =
         '#/login';
+    }
+
+    if (
+      event.target.id ===
+      'subscribeButton'
+    ) {
+
+      await registerServiceWorker();
+    }
+
+    if (
+      event.target.id ===
+      'unsubscribeButton'
+    ) {
+
+      const registration =
+        await navigator.serviceWorker.ready;
+
+      const subscription =
+        await registration.pushManager.getSubscription();
+
+      if (subscription) {
+
+        await subscription.unsubscribe();
+
+        alert(
+          'Berhasil unsubscribe'
+        );
+      }
     }
   }
 );

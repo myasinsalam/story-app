@@ -31,10 +31,29 @@ class App {
       return;
     }
 
-    this._content.innerHTML =
-      await page.render();
+    /* VIEW TRANSITION */
 
-    await page.afterRender();
+    if (
+      document.startViewTransition
+    ) {
+
+      document.startViewTransition(
+        async () => {
+
+          this._content.innerHTML =
+            await page.render();
+
+          await page.afterRender();
+        }
+      );
+
+    } else {
+
+      this._content.innerHTML =
+        await page.render();
+
+      await page.afterRender();
+    }
   }
 }
 

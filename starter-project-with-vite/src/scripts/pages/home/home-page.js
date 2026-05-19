@@ -139,7 +139,7 @@ const HomePage = {
           );
 
         storyElement.innerHTML = `
-          <div
+          <article
             style="
               border:1px solid #ddd;
               border-radius:12px;
@@ -172,6 +172,18 @@ const HomePage = {
                 ${story.description}
               </p>
 
+              <p>
+                ID:
+                ${story.id}
+              </p>
+
+              <p>
+                Dibuat:
+                ${new Date(
+                  story.createdAt
+                ).toLocaleString()}
+              </p>
+
               <button
                 class="save-btn"
                 data-id="${story.id}"
@@ -181,7 +193,7 @@ const HomePage = {
 
             </div>
 
-          </div>
+          </article>
         `;
 
         storiesContainer.appendChild(
@@ -259,7 +271,7 @@ const HomePage = {
             );
 
           storyElement.innerHTML = `
-            <div
+            <article
               style="
                 border:1px solid #ddd;
                 border-radius:12px;
@@ -301,7 +313,7 @@ const HomePage = {
 
               </div>
 
-            </div>
+            </article>
           `;
 
           bookmarkContainer.appendChild(
