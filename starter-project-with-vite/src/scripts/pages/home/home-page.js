@@ -173,11 +173,6 @@ const HomePage = {
               </p>
 
               <p>
-                ID:
-                ${story.id}
-              </p>
-
-              <p>
                 Dibuat:
                 ${new Date(
                   story.createdAt
