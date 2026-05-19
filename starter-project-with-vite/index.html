@@ -12,12 +12,12 @@
 
   <meta
     name="theme-color"
-    content="#87cefa"
+    content="#ffffff"
   />
 
   <link
     rel="manifest"
-    href="manifest.json"
+    href="./manifest.json"
   />
 
   <title>
@@ -28,89 +28,54 @@
 
 <body>
 
-  <a
-    href="#mainContent"
-    class="skip-link"
-  >
-    Skip to content
-  </a>
-
   <header>
 
-    <div class="main-header container">
+    <nav
+      style="
+        display:flex;
+        gap:12px;
+        align-items:center;
+        padding:16px;
+        flex-wrap:wrap;
+      "
+    >
 
-      <a
-        href="#/"
-        class="brand-name"
-      >
-        Story App
+      <a href="#/">
+        Home
       </a>
 
-      <nav class="navigation-drawer">
+      <a href="#/add-story">
+        Add Story
+      </a>
 
-        <ul class="nav-list">
+      <a href="#/bookmark">
+        Bookmark
+      </a>
 
-          <li>
-            <a href="#/">
-              Home
-            </a>
-          </li>
+      <button id="subscribeButton">
+        Subscribe
+      </button>
 
-          <li>
-            <a href="#/add-story">
-              Add Story
-            </a>
-          </li>
+      <button id="unsubscribeButton">
+        Unsubscribe
+      </button>
 
-          <li>
-            <a href="#/bookmark">
-              Bookmark
-            </a>
-          </li>
+      <button id="logoutButton">
+        Logout
+      </button>
 
-          <li>
-            <button id="subscribeButton">
-              Subscribe
-            </button>
-          </li>
-
-          <li>
-            <button id="unsubscribeButton">
-              Unsubscribe
-            </button>
-          </li>
-
-          <li>
-            <button id="logoutButton">
-              Logout
-            </button>
-          </li>
-
-        </ul>
-
-      </nav>
-
-    </div>
+    </nav>
 
   </header>
 
-  <main
-    id="mainContent"
-    class="main-content"
-  ></main>
-
-  <footer>
-
-    <p>
-      Story App Dicoding
-    </p>
-
-  </footer>
+  <main id="mainContent">
+  </main>
 
   <script
     type="module"
-    src="/src/main.js"
+    src="./src/main.js"
   ></script>
 
 </body>
+
 </html>
