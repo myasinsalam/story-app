@@ -7,7 +7,7 @@ import {
 } from './scripts/data/api.js';
 
 const VAPID_PUBLIC_KEY =
-  'ISI_VAPID_KEY_ASLI_DARI_DICODING';
+  'BCCs2eonMI-6H2ctvFaWg-UYdDv387Vno_bzUzALpB442r2lCnsHmtrx8biyPi_E-1fSGABK_Qs_GlvPoJJqxbk';
 
 function urlBase64ToUint8Array(
   base64String
@@ -127,5 +127,24 @@ window.addEventListener(
     await app.renderPage();
 
     await registerServiceWorker();
+  }
+);
+
+window.addEventListener(
+  'click',
+  (event) => {
+
+    if (
+      event.target.id ===
+      'logoutButton'
+    ) {
+
+      localStorage.removeItem(
+        'token'
+      );
+
+      window.location.hash =
+        '#/login';
+    }
   }
 );

@@ -2,11 +2,9 @@ import L from 'leaflet';
 
 import 'leaflet/dist/leaflet.css';
 
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-
-import { getStories } from '../../data/api.js';
+import {
+  getStories,
+} from '../../data/api.js';
 
 import {
   saveStory,
@@ -17,9 +15,14 @@ import {
 delete L.Icon.Default.prototype._getIconUrl;
 
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: markerIcon2x,
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
+  iconRetinaUrl:
+    'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+
+  iconUrl:
+    'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+
+  shadowUrl:
+    'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
 const HomePage = {
@@ -29,78 +32,56 @@ const HomePage = {
     return `
       <section class="container">
 
-        <div class="home-header">
-
-          <h1>Daftar Story</h1>
-
-          <div
-            style="
-              display:flex;
-              gap:12px;
-            "
-          >
-
-            <a
-              href="#/add-story"
-              class="button"
-            >
-              Add Story
-            </a>
-
-            <button
-              id="logoutButton"
-              class="button"
-            >
-              Logout
-            </button>
-
-          </div>
-
-        </div>
+        <h1>
+          Daftar Story
+        </h1>
 
         <div
           id="map"
           style="
             height:400px;
             margin-bottom:24px;
-            border-radius:16px;
           "
         ></div>
 
-        <h2
-          style="
-            margin-bottom:16px;
-          "
-        >
-          Story API
-        </h2>
-
         <div
-          id="storiesList"
-          class="stories-grid"
+          id="stories"
+          style="
+            display:grid;
+            grid-template-columns:
+              repeat(
+                auto-fit,
+                minmax(
+                  250px,
+                  1fr
+                )
+              );
+            gap:16px;
+          "
         ></div>
 
         <h2
           style="
             margin-top:40px;
-            margin-bottom:8px;
           "
         >
           Bookmark Story
         </h2>
 
-        <p
-          style="
-            margin-bottom:16px;
-          "
-        >
-          Story yang disimpan pengguna
-          menggunakan IndexedDB.
-        </p>
-
         <div
-          id="savedStories"
-          class="stories-grid"
+          id="bookmarkStories"
+          style="
+            display:grid;
+            grid-template-columns:
+              repeat(
+                auto-fit,
+                minmax(
+                  250px,
+                  1fr
+                )
+              );
+            gap:16px;
+          "
         ></div>
 
       </section>
@@ -122,61 +103,90 @@ const HomePage = {
       return;
     }
 
-    const logoutButton =
+    const result =
+      await getStories(token);
+
+    const storiesContainer =
       document.getElementById(
-        'logoutButton'
+        'stories'
       );
 
-    logoutButton.addEventListener(
-      'click',
-      () => {
+    const bookmarkContainer =
+      document.getElementById(
+        'bookmarkStories'
+      );
 
-        localStorage.removeItem(
-          'token'
-        );
+    const map = L.map('map')
+      .setView(
+        [-2.5, 118],
+        5
+      );
 
-        window.location.hash =
-          '#/login';
+    L.tileLayer(
+      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+      {
+        attribution:
+          '&copy; OpenStreetMap',
       }
-    );
+    ).addTo(map);
 
-    const storiesList =
-      document.getElementById(
-        'storiesList'
-      );
+    result.listStory.forEach(
+      (story) => {
 
-    const savedStoriesContainer =
-      document.getElementById(
-        'savedStories'
-      );
+        const storyElement =
+          document.createElement(
+            'div'
+          );
 
-    try {
+        storyElement.innerHTML = `
+          <div
+            style="
+              border:1px solid #ddd;
+              border-radius:12px;
+              overflow:hidden;
+              background:#fff;
+            "
+          >
 
-      const result =
-        await getStories(token);
+            <img
+              src="${story.photoUrl}"
+              alt="${story.name}"
+              style="
+                width:100%;
+                height:200px;
+                object-fit:cover;
+              "
+            />
 
-      const stories =
-        result.listStory || [];
+            <div
+              style="
+                padding:16px;
+              "
+            >
 
-      /* MAP */
+              <h3>
+                ${story.name}
+              </h3>
 
-      const map =
-        L.map('map').setView(
-          [-2.5, 118],
-          5
+              <p>
+                ${story.description}
+              </p>
+
+              <button
+                class="save-btn"
+                data-id="${story.id}"
+              >
+                Simpan
+              </button>
+
+            </div>
+
+          </div>
+        `;
+
+        storiesContainer.appendChild(
+          storyElement
         );
-
-      L.tileLayer(
-        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-        {
-          attribution:
-            '&copy; OpenStreetMap',
-        }
-      ).addTo(map);
-
-      /* MARKER */
-
-      stories.forEach((story) => {
 
         if (
           story.lat &&
@@ -189,147 +199,124 @@ const HomePage = {
           ])
           .addTo(map)
           .bindPopup(`
-            <img
-              src="${story.photoUrl}"
-              alt="${story.name}"
-              width="120"
-              style="
-                border-radius:8px;
-                margin-bottom:8px;
-              "
-            />
-
-            <br>
-
             <b>
               ${story.name}
             </b>
-
             <br>
-
             ${story.description}
           `);
         }
-      });
+      }
+    );
 
-      /* STORY LIST */
+    const saveButtons =
+      document.querySelectorAll(
+        '.save-btn'
+      );
 
-      storiesList.innerHTML =
-        stories.map((story) => `
-          <article
-            class="story-card"
-          >
+    saveButtons.forEach(
+      (button) => {
 
-            <img
-              src="${story.photoUrl}"
-              alt="${story.name}"
-              class="story-image"
-            />
+        button.addEventListener(
+          'click',
+          async () => {
 
-            <div
-              class="story-content"
-            >
-
-              <h2>
-                ${story.name}
-              </h2>
-
-              <p>
-                ${story.description}
-              </p>
-
-              <button
-                class="save-button"
-                data-id="${story.id}"
-              >
-                Simpan ke Bookmark
-              </button>
-
-            </div>
-
-          </article>
-        `).join('');
-
-      /* SAVE STORY */
-
-      document
-        .querySelectorAll(
-          '.save-button'
-        )
-        .forEach((button) => {
-
-          button.addEventListener(
-            'click',
-            async () => {
-
-              const story =
-                stories.find(
-                  (item) =>
-                    item.id ===
-                    button.dataset.id
-                );
-
-              await saveStory(
-                story
+            const story =
+              result.listStory.find(
+                (item) =>
+                  item.id ===
+                  button.dataset.id
               );
 
-              alert(
-                'Story berhasil disimpan'
-              );
+            await saveStory(
+              story
+            );
 
-              location.reload();
-            }
-          );
-        });
+            alert(
+              'Story disimpan'
+            );
 
-      /* GET SAVED STORIES */
+            loadBookmarks();
+          }
+        );
+      }
+    );
 
-      const savedStories =
+    async function loadBookmarks() {
+
+      bookmarkContainer.innerHTML =
+        '';
+
+      const stories =
         await getAllStories();
 
-      savedStoriesContainer.innerHTML =
-        savedStories.map((story) => `
-          <article
-            class="story-card"
-          >
+      stories.forEach(
+        (story) => {
 
-            <img
-              src="${story.photoUrl}"
-              alt="${story.name}"
-              class="story-image"
-            />
+          const storyElement =
+            document.createElement(
+              'div'
+            );
 
+          storyElement.innerHTML = `
             <div
-              class="story-content"
+              style="
+                border:1px solid #ddd;
+                border-radius:12px;
+                overflow:hidden;
+                background:#fff;
+              "
             >
 
-              <h2>
-                ${story.name}
-              </h2>
+              <img
+                src="${story.photoUrl}"
+                alt="${story.name}"
+                style="
+                  width:100%;
+                  height:200px;
+                  object-fit:cover;
+                "
+              />
 
-              <p>
-                ${story.description}
-              </p>
-
-              <button
-                class="delete-button"
-                data-id="${story.id}"
+              <div
+                style="
+                  padding:16px;
+                "
               >
-                Hapus Bookmark
-              </button>
+
+                <h3>
+                  ${story.name}
+                </h3>
+
+                <p>
+                  ${story.description}
+                </p>
+
+                <button
+                  class="delete-btn"
+                  data-id="${story.id}"
+                >
+                  Hapus
+                </button>
+
+              </div>
 
             </div>
+          `;
 
-          </article>
-        `).join('');
+          bookmarkContainer.appendChild(
+            storyElement
+          );
+        }
+      );
 
-      /* DELETE STORY */
+      const deleteButtons =
+        document.querySelectorAll(
+          '.delete-btn'
+        );
 
-      document
-        .querySelectorAll(
-          '.delete-button'
-        )
-        .forEach((button) => {
+      deleteButtons.forEach(
+        (button) => {
 
           button.addEventListener(
             'click',
@@ -340,24 +327,17 @@ const HomePage = {
               );
 
               alert(
-                'Story berhasil dihapus'
+                'Bookmark dihapus'
               );
 
-              location.reload();
+              loadBookmarks();
             }
           );
-        });
-
-    } catch (error) {
-
-      console.error(error);
-
-      storiesList.innerHTML = `
-        <p>
-          Gagal memuat story
-        </p>
-      `;
+        }
+      );
     }
+
+    loadBookmarks();
   },
 };
 

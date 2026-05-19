@@ -9,6 +9,8 @@ const urlsToCache = [
   './images/icon-512.png',
 ];
 
+/* INSTALL */
+
 self.addEventListener(
   'install',
   (event) => {
@@ -27,6 +29,8 @@ self.addEventListener(
     self.skipWaiting();
   }
 );
+
+/* ACTIVATE */
 
 self.addEventListener(
   'activate',
@@ -61,6 +65,8 @@ self.addEventListener(
   }
 );
 
+/* FETCH */
+
 self.addEventListener(
   'fetch',
   (event) => {
@@ -90,11 +96,13 @@ self.addEventListener(
   }
 );
 
+/* PUSH NOTIFICATION */
+
 self.addEventListener(
   'push',
   (event) => {
 
-    const data = {
+    let data = {
       title: 'Story App',
       options: {
         body:
@@ -102,11 +110,43 @@ self.addEventListener(
       },
     };
 
+    if (event.data) {
+
+      data =
+        event.data.json();
+    }
+
     event.waitUntil(
 
       self.registration.showNotification(
         data.title,
-        data.options
+        {
+          body:
+            data.options.body,
+
+          icon:
+            './images/icon-192.png',
+
+          badge:
+            './images/icon-192.png',
+        }
+      )
+    );
+  }
+);
+
+/* NOTIFICATION CLICK */
+
+self.addEventListener(
+  'notificationclick',
+  (event) => {
+
+    event.notification.close();
+
+    event.waitUntil(
+
+      clients.openWindow(
+        './'
       )
     );
   }
