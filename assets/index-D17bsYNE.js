@@ -92,11 +92,6 @@
               </p>
 
               <p>
-                ID:
-                ${E.id}
-              </p>
-
-              <p>
                 Dibuat:
                 ${new Date(E.createdAt).toLocaleString()}
               </p>
