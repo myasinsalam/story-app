@@ -7,7 +7,7 @@ import {
 } from './scripts/data/api.js';
 
 const VAPID_PUBLIC_KEY =
-  'ISI_VAPID_KEY_ASLI';
+  'ISI_VAPID_KEY_ASLI_DARI_DICODING';
 
 function urlBase64ToUint8Array(
   base64String
