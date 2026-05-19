@@ -8,7 +8,7 @@ import {
 } from './scripts/data/api.js';
 
 const VAPID_PUBLIC_KEY =
-  'PASTE_VAPID_KEY_ASLI_DICODING';
+  'BEl62iUYgUivTBV6FP0F4P4n6uT0KjQ9j0M9R8Tn2f0rGf6g3Ww2X6VvVn6M1j8N5m5Z0v5P7x8Y2Q3A4F5G6H7';
 
 function urlBase64ToUint8Array(
   base64String
