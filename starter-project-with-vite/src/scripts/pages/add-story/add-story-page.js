@@ -219,7 +219,7 @@ const AddStoryPage = {
             );
 
             window.location.hash =
-              '#/home';
+              '#/';
 
           } else {
 

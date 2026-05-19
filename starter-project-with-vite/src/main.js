@@ -7,7 +7,9 @@ import {
 } from './scripts/data/api.js';
 
 const VAPID_PUBLIC_KEY =
-  'BCCs2eonMI-6H2ctvFaWg-UYdDv387Vno_bzUzALpB442r2lCnsHmtrx8biyPi_E-1fSGABK_Qs_GlvPoJJqxbk';
+  'MASUKKAN_VAPID_KEY_ASLI_DARI_DICODING';
+
+/* BASE64 */
 
 function urlBase64ToUint8Array(
   base64String
@@ -34,6 +36,8 @@ function urlBase64ToUint8Array(
   );
 }
 
+/* SERVICE WORKER */
+
 async function registerServiceWorker() {
 
   if (
@@ -59,13 +63,33 @@ async function registerServiceWorker() {
     if (
       permission !== 'granted'
     ) {
+
       return;
     }
 
-    const subscription =
+    /* CEK SUBSCRIPTION LAMA */
+
+    let subscription =
+      await registration.pushManager.getSubscription();
+
+    /* HAPUS SUBSCRIPTION LAMA */
+
+    if (subscription) {
+
+      await subscription.unsubscribe();
+
+      console.log(
+        'Old subscription removed'
+      );
+    }
+
+    /* SUBSCRIBE BARU */
+
+    subscription =
       await registration.pushManager.subscribe(
         {
           userVisibleOnly: true,
+
           applicationServerKey:
             urlBase64ToUint8Array(
               VAPID_PUBLIC_KEY
@@ -84,9 +108,11 @@ async function registerServiceWorker() {
         {
           endpoint:
             subscription.endpoint,
+
           keys: {
             p256dh:
               subscription.toJSON().keys.p256dh,
+
             auth:
               subscription.toJSON().keys.auth,
           },
@@ -101,9 +127,13 @@ async function registerServiceWorker() {
 
   } catch (error) {
 
-    console.error(error);
+    console.error(
+      error
+    );
   }
 }
+
+/* APP */
 
 const app = new App({
   content:
@@ -112,6 +142,8 @@ const app = new App({
     ),
 });
 
+/* ROUTE */
+
 window.addEventListener(
   'hashchange',
   async () => {
@@ -119,6 +151,8 @@ window.addEventListener(
     await app.renderPage();
   }
 );
+
+/* LOAD */
 
 window.addEventListener(
   'load',
@@ -129,6 +163,8 @@ window.addEventListener(
     await registerServiceWorker();
   }
 );
+
+/* LOGOUT */
 
 window.addEventListener(
   'click',
