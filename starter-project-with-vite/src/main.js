@@ -8,7 +8,7 @@ import {
 } from './scripts/data/api.js';
 
 const VAPID_PUBLIC_KEY =
-  'BEl62iUYgUivTBV6FP0F4P4n6uT0KjQ9j0M9R8Tn2f0rGf6g3Ww2X6VvVn6M1j8N5m5Z0v5P7x8Y2Q3A4F5G6H7';
+  'BCCs2eonMI-6H2ctvFaWg-UYdDv387Vno_bzUzALpB442r2lCnsHmtrx8biyPi_E-1fSGABK_Qs_GlvPoJJqxbk';
 
 function urlBase64ToUint8Array(
   base64String
@@ -35,13 +35,7 @@ function urlBase64ToUint8Array(
   );
 }
 
-async function registerServiceWorker() {
-
-  if (
-    !('serviceWorker' in navigator)
-  ) {
-    return;
-  }
+async function subscribeUser() {
 
   try {
 
@@ -49,7 +43,12 @@ async function registerServiceWorker() {
       await navigator.serviceWorker.register(
         '/story-app/sw.js'
       );
-      await navigator.serviceWorker.ready;
+
+    await navigator.serviceWorker.ready;
+
+    console.log(
+      'SW READY'
+    );
 
     const permission =
       await Notification.requestPermission();
@@ -57,8 +56,17 @@ async function registerServiceWorker() {
     if (
       permission !== 'granted'
     ) {
+
+      console.log(
+        'NOTIFICATION DENIED'
+      );
+
       return;
     }
+
+    console.log(
+      'NOTIFICATION GRANTED'
+    );
 
     let subscription =
       await registration.pushManager.getSubscription();
@@ -76,34 +84,85 @@ async function registerServiceWorker() {
               ),
           }
         );
+    }
+
+    console.log(
+      'SUBSCRIPTION:',
+      subscription
+    );
+
+    const token =
+      localStorage.getItem(
+        'token'
+      );
+
+    console.log(
+      'TOKEN:',
+      token
+    );
+
+    const response =
+      await subscribeNotification(
+        {
+          endpoint:
+            subscription.endpoint,
+
+          keys: {
+            p256dh:
+              subscription.toJSON().keys.p256dh,
+
+            auth:
+              subscription.toJSON().keys.auth,
+          },
+        },
+        token
+      );
+
+    console.log(
+      'POST RESPONSE:',
+      response
+    );
+
+    alert(
+      'Subscribe berhasil'
+    );
+
+  } catch (error) {
+
+    console.error(
+      'SUBSCRIBE ERROR:',
+      error
+    );
+  }
+}
+
+async function unsubscribeUser() {
+
+  try {
+
+    const registration =
+      await navigator.serviceWorker.ready;
+
+    const subscription =
+      await registration.pushManager.getSubscription();
+
+    if (subscription) {
 
       const token =
         localStorage.getItem(
           'token'
         );
 
-      if (token) {
+      await unsubscribeNotification(
+        subscription.endpoint,
+        token
+      );
 
-        await subscribeNotification(
-          {
-            endpoint:
-              subscription.endpoint,
+      await subscription.unsubscribe();
 
-            keys: {
-              p256dh:
-                subscription.toJSON().keys.p256dh,
-
-              auth:
-                subscription.toJSON().keys.auth,
-            },
-          },
-          token
-        );
-
-        alert(
-          'Berhasil subscribe notification'
-        );
-      }
+      alert(
+        'Unsubscribe berhasil'
+      );
     }
 
   } catch (error) {
@@ -188,7 +247,7 @@ window.addEventListener(
       'subscribeButton'
     ) {
 
-      await registerServiceWorker();
+      await subscribeUser();
     }
 
     if (
@@ -196,30 +255,7 @@ window.addEventListener(
       'unsubscribeButton'
     ) {
 
-      const registration =
-        await navigator.serviceWorker.ready;
-
-      const subscription =
-        await registration.pushManager.getSubscription();
-
-      if (subscription) {
-
-        const token =
-          localStorage.getItem(
-            'token'
-          );
-
-        await unsubscribeNotification(
-          subscription.endpoint,
-          token
-        );
-
-        await subscription.unsubscribe();
-
-        alert(
-          'Berhasil unsubscribe'
-        );
-      }
+      await unsubscribeUser();
     }
   }
 );
