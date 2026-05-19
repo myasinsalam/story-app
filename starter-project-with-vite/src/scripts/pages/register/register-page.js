@@ -7,57 +7,51 @@ const RegisterPage = {
     return `
       <section class="container">
 
-        <h1 style="margin-bottom:20px;">
-          Register
-        </h1>
+        <h1>Register</h1>
 
         <form id="registerForm">
 
-          <label for="name">
-            Nama
-          </label>
+          <div>
+            <label for="name">
+              Nama
+            </label>
 
-          <input
-            type="text"
-            id="name"
-            required
-          />
+            <input
+              id="name"
+              type="text"
+              required
+            />
+          </div>
 
-          <label for="email">
-            Email
-          </label>
+          <div>
+            <label for="email">
+              Email
+            </label>
 
-          <input
-            type="email"
-            id="email"
-            required
-          />
+            <input
+              id="email"
+              type="email"
+              required
+            />
+          </div>
 
-          <label for="password">
-            Password
-          </label>
+          <div>
+            <label for="password">
+              Password
+            </label>
 
-          <input
-            type="password"
-            id="password"
-            required
-          />
+            <input
+              id="password"
+              type="password"
+              required
+            />
+          </div>
 
           <button type="submit">
             Register
           </button>
 
         </form>
-
-        <p style="margin-top:16px;">
-
-          Sudah punya akun?
-
-          <a href="#/login">
-            Login
-          </a>
-
-        </p>
 
       </section>
     `;
@@ -66,8 +60,8 @@ const RegisterPage = {
   async afterRender() {
 
     const form =
-      document.querySelector(
-        '#registerForm'
+      document.getElementById(
+        'registerForm'
       );
 
     form.addEventListener(
@@ -76,52 +70,40 @@ const RegisterPage = {
 
         event.preventDefault();
 
-        try {
+        const name =
+          document.getElementById(
+            'name'
+          ).value;
 
-          const name =
-            document.querySelector(
-              '#name'
-            ).value;
+        const email =
+          document.getElementById(
+            'email'
+          ).value;
 
-          const email =
-            document.querySelector(
-              '#email'
-            ).value;
+        const password =
+          document.getElementById(
+            'password'
+          ).value;
 
-          const password =
-            document.querySelector(
-              '#password'
-            ).value;
+        const result =
+          await register(
+            name,
+            email,
+            password
+          );
 
-          const result =
-            await register(
-              name,
-              email,
-              password
-            );
-
-          if (!result.error) {
-
-            alert(
-              'Register berhasil'
-            );
-
-            window.location.hash =
-              '#/login';
-
-          } else {
-
-            alert(
-              result.message
-            );
-          }
-
-        } catch (error) {
-
-          console.error(error);
+        if (!result.error) {
 
           alert(
-            'Register gagal'
+            'Register berhasil'
+          );
+
+          window.location.hash =
+            '#/login';
+        } else {
+
+          alert(
+            result.message
           );
         }
       }
