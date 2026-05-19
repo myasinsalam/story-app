@@ -95,7 +95,7 @@
                 class="save-btn"
                 data-id="${E.id}"
               >
-                Simpan
+                Bookmark
               </button>
 
             </div>
@@ -107,7 +107,7 @@
             </b>
             <br>
             ${E.description}
-          `)}),document.querySelectorAll(".save-btn").forEach(E=>{E.addEventListener("click",async()=>{const p=c.listStory.find(Z=>Z.id===E.dataset.id);await As(p),alert("Story disimpan"),g()})});async function g(){P.innerHTML="",(await Ds()).forEach(Z=>{const V=document.createElement("div");V.innerHTML=`
+          `)}),document.querySelectorAll(".save-btn").forEach(E=>{E.addEventListener("click",async()=>{const p=c.listStory.find(Z=>Z.id===E.dataset.id);await As(p),alert("Bookmark berhasil disimpan"),g()})});async function g(){P.innerHTML="",(await Ds()).forEach(Z=>{const V=document.createElement("div");V.innerHTML=`
             <div
               style="
                 border:1px solid #ddd;
@@ -145,13 +145,13 @@
                   class="delete-btn"
                   data-id="${Z.id}"
                 >
-                  Hapus
+                  Hapus Bookmark
                 </button>
 
               </div>
 
             </div>
-          `,P.appendChild(V)}),document.querySelectorAll(".delete-btn").forEach(Z=>{Z.addEventListener("click",async()=>{await Ns(Z.dataset.id),alert("Bookmark dihapus"),g()})})}g()}},Fs={async render(){return`
+          `,P.appendChild(V)}),document.querySelectorAll(".delete-btn").forEach(Z=>{Z.addEventListener("click",async()=>{await Ns(Z.dataset.id),alert("Bookmark berhasil dihapus"),g()})})}g()}},Fs={async render(){return`
       <section class="container">
 
         <h1>Login</h1>
