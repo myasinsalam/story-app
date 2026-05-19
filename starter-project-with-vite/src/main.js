@@ -47,8 +47,9 @@ async function registerServiceWorker() {
 
     const registration =
       await navigator.serviceWorker.register(
-        '/story-app/sw.js'
+        '/sw.js'
       );
+      await navigator.serviceWorker.ready;
 
     const permission =
       await Notification.requestPermission();
