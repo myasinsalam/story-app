@@ -67,23 +67,13 @@ async function registerServiceWorker() {
       return;
     }
 
-    /* CEK SUBSCRIPTION LAMA */
-
     let subscription =
       await registration.pushManager.getSubscription();
-
-    /* HAPUS SUBSCRIPTION LAMA */
 
     if (subscription) {
 
       await subscription.unsubscribe();
-
-      console.log(
-        'Old subscription removed'
-      );
     }
-
-    /* SUBSCRIBE BARU */
 
     subscription =
       await registration.pushManager.subscribe(
@@ -142,11 +132,40 @@ const app = new App({
     ),
 });
 
+/* NAVBAR LOGIN REGISTER */
+
+function updateNavbar() {
+
+  const path =
+    window.location.hash;
+
+  const header =
+    document.querySelector(
+      'header'
+    );
+
+  if (
+    path === '#/login' ||
+    path === '#/register'
+  ) {
+
+    header.style.display =
+      'none';
+
+  } else {
+
+    header.style.display =
+      'block';
+  }
+}
+
 /* ROUTE */
 
 window.addEventListener(
   'hashchange',
   async () => {
+
+    updateNavbar();
 
     await app.renderPage();
   }
@@ -157,6 +176,8 @@ window.addEventListener(
 window.addEventListener(
   'load',
   async () => {
+
+    updateNavbar();
 
     await app.renderPage();
 
