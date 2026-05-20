@@ -217,6 +217,28 @@ const AddStoryPage = {
           'success'
         );
 
+        if (
+          'serviceWorker' in navigator
+        ) {
+
+          const registration =
+            await navigator.serviceWorker.ready;
+
+          registration.showNotification(
+            'Story App',
+            {
+              body:
+                'Story baru berhasil ditambahkan',
+
+              icon:
+                '/story-app/images/icon-192.png',
+
+              badge:
+                '/story-app/images/icon-192.png',
+            }
+          );
+        }
+
         window.location.hash =
           '#/';
       }
