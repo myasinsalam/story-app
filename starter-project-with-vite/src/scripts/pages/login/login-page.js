@@ -1,39 +1,41 @@
-import { login } from '../../data/api.js';
+import Swal from 'sweetalert2';
+
+import {
+  login,
+} from '../../data/api.js';
 
 const LoginPage = {
 
   async render() {
 
     return `
-      <section class="container">
+      <section class="auth-container">
 
-        <h1>Login</h1>
+        <h1>
+          Login
+        </h1>
 
         <form id="loginForm">
 
-          <div>
-            <label for="email">
-              Email
-            </label>
+          <label for="email">
+            Email
+          </label>
 
-            <input
-              id="email"
-              type="email"
-              required
-            />
-          </div>
+          <input
+            id="email"
+            type="email"
+            required
+          />
 
-          <div>
-            <label for="password">
-              Password
-            </label>
+          <label for="password">
+            Password
+          </label>
 
-            <input
-              id="password"
-              type="password"
-              required
-            />
-          </div>
+          <input
+            id="password"
+            type="password"
+            required
+          />
 
           <button type="submit">
             Login
@@ -41,16 +43,14 @@ const LoginPage = {
 
         </form>
 
-        <p
-          style="
-            margin-top:16px;
-          "
-        >
+        <p style="margin-top:16px;">
+
           Belum punya akun?
 
           <a href="#/register">
-            Register
+            Register di sini
           </a>
+
         </p>
 
       </section>
@@ -70,6 +70,15 @@ const LoginPage = {
 
         event.preventDefault();
 
+        Swal.fire({
+          title: 'Loading...',
+          text: 'Sedang login',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+
         const email =
           document.getElementById(
             'email'
@@ -80,27 +89,40 @@ const LoginPage = {
             'password'
           ).value;
 
-        const result =
+        const response =
           await login(
             email,
             password
           );
 
-        if (!result.error) {
+        Swal.close();
 
-          localStorage.setItem(
-            'token',
-            result.loginResult.token
+        if (
+          response.error
+        ) {
+
+          Swal.fire(
+            'Gagal',
+            response.message,
+            'error'
           );
 
-          window.location.hash =
-            '#/';
-        } else {
-
-          alert(
-            result.message
-          );
+          return;
         }
+
+        localStorage.setItem(
+          'token',
+          response.loginResult.token
+        );
+
+        Swal.fire(
+          'Berhasil',
+          'Login berhasil',
+          'success'
+        );
+
+        window.location.hash =
+          '#/';
       }
     );
   },

@@ -1,3 +1,5 @@
+import Swal from 'sweetalert2';
+
 import {
   register,
 } from '../../data/api.js';
@@ -51,18 +53,6 @@ const RegisterPage = {
 
         </form>
 
-        <p
-          style="
-            margin-top:16px;
-          "
-        >
-          Sudah punya akun?
-
-          <a href="#/login">
-            Login di sini
-          </a>
-        </p>
-
       </section>
     `;
   },
@@ -79,6 +69,15 @@ const RegisterPage = {
       async (event) => {
 
         event.preventDefault();
+
+        Swal.fire({
+          title: 'Loading...',
+          text: 'Sedang register',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
 
         const name =
           document.getElementById(
@@ -102,8 +101,25 @@ const RegisterPage = {
             password
           );
 
-        alert(
-          response.message
+        Swal.close();
+
+        if (
+          response.error
+        ) {
+
+          Swal.fire(
+            'Gagal',
+            response.message,
+            'error'
+          );
+
+          return;
+        }
+
+        Swal.fire(
+          'Berhasil',
+          'Register berhasil',
+          'success'
         );
 
         window.location.hash =

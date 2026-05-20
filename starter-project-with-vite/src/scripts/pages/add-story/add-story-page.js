@@ -1,8 +1,10 @@
 import L from 'leaflet';
 
-import 'leaflet/dist/leaflet.css';
+import Swal from 'sweetalert2';
 
-import { addStory } from '../../data/api.js';
+import {
+  addStory,
+} from '../../data/api.js';
 
 const AddStoryPage = {
 
@@ -11,49 +13,55 @@ const AddStoryPage = {
     return `
       <section class="container">
 
-        <h1 style="margin-bottom:20px;">
-          Tambah Story
+        <h1>
+          Add Story
         </h1>
 
         <form id="addStoryForm">
 
-          <label for="description">
-            Deskripsi Story
-          </label>
+          <div class="form-control">
 
-          <textarea
-            id="description"
-            required
-          ></textarea>
+            <label for="description">
+              Description
+            </label>
 
-          <label for="photo">
-            Upload Foto
-          </label>
+            <textarea
+              id="description"
+              required
+            ></textarea>
 
-          <input
-            type="file"
-            id="photo"
-            accept="image/*"
-            required
-          />
+          </div>
 
-          <div
-            id="map"
-            style="
-              height:400px;
-              border-radius:16px;
-              margin-bottom:16px;
-            "
-          ></div>
+          <div class="form-control">
 
-          <div
-            id="selectedLocation"
-            style="
-              margin-bottom:16px;
-              font-weight:bold;
-            "
-          >
-            Klik peta untuk memilih lokasi
+            <label for="photo">
+              Upload Photo
+            </label>
+
+            <input
+              type="file"
+              id="photo"
+              accept="image/*"
+              capture="environment"
+              required
+            />
+
+          </div>
+
+          <div class="form-control">
+
+            <label>
+              Pilih Lokasi
+            </label>
+
+            <div
+              id="map"
+              style="
+                height: 400px;
+                margin-top: 10px;
+              "
+            ></div>
+
           </div>
 
           <button type="submit">
@@ -68,13 +76,24 @@ const AddStoryPage = {
 
   async afterRender() {
 
-    let latitude = null;
-    let longitude = null;
+    const form =
+      document.getElementById(
+        'addStoryForm'
+      );
 
-    /* MAP */
+    const photoInput =
+      document.getElementById(
+        'photo'
+      );
 
-    const map = L.map('map').setView(
-      [-2.5, 118],
+    let selectedLat = null;
+
+    let selectedLon = null;
+
+    const map = L.map(
+      'map'
+    ).setView(
+      [-6.2, 106.816666],
       5
     );
 
@@ -82,53 +101,36 @@ const AddStoryPage = {
       'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
       {
         attribution:
-          '&copy; OpenStreetMap',
+          '&copy; OpenStreetMap contributors',
       }
     ).addTo(map);
 
     let marker;
 
-    const selectedLocation =
-      document.querySelector(
-        '#selectedLocation'
-      );
+    map.on(
+      'click',
+      (event) => {
 
-    map.on('click', (event) => {
+        selectedLat =
+          event.latlng.lat;
 
-      latitude = event.latlng.lat;
-      longitude = event.latlng.lng;
+        selectedLon =
+          event.latlng.lng;
 
-      selectedLocation.innerHTML = `
-        Latitude:
-        ${latitude.toFixed(5)}
+        if (marker) {
 
-        <br>
+          marker.setLatLng(
+            event.latlng
+          );
 
-        Longitude:
-        ${longitude.toFixed(5)}
-      `;
+        } else {
 
-      if (marker) {
-
-        map.removeLayer(marker);
+          marker = L.marker(
+            event.latlng
+          ).addTo(map);
+        }
       }
-
-      marker = L.marker([
-        latitude,
-        longitude,
-      ]).addTo(map);
-
-      marker.bindPopup(
-        'Lokasi dipilih'
-      ).openPopup();
-    });
-
-    /* FORM */
-
-    const form =
-      document.querySelector(
-        '#addStoryForm'
-      );
+    );
 
     form.addEventListener(
       'submit',
@@ -136,106 +138,87 @@ const AddStoryPage = {
 
         event.preventDefault();
 
-        try {
+        Swal.fire({
+          title: 'Loading...',
+          text:
+            'Sedang menambah story',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
 
-          const token =
-            localStorage.getItem(
-              'token'
-            );
+        const description =
+          document.getElementById(
+            'description'
+          ).value;
 
-          if (!token) {
+        const photo =
+          photoInput.files[0];
 
-            alert(
-              'Silakan login terlebih dahulu'
-            );
+        const formData =
+          new FormData();
 
-            window.location.hash =
-              '#/login';
+        formData.append(
+          'description',
+          description
+        );
 
-            return;
-          }
+        formData.append(
+          'photo',
+          photo
+        );
 
-          const description =
-            document.querySelector(
-              '#description'
-            ).value;
-
-          const photo =
-            document.querySelector(
-              '#photo'
-            ).files[0];
-
-          const formData =
-            new FormData();
+        if (
+          selectedLat &&
+          selectedLon
+        ) {
 
           formData.append(
-            'description',
-            description
+            'lat',
+            selectedLat
           );
 
           formData.append(
-            'photo',
-            photo
-          );
-
-          if (
-            latitude &&
-            longitude
-          ) {
-
-            formData.append(
-              'lat',
-              latitude
-            );
-
-            formData.append(
-              'lon',
-              longitude
-            );
-          }
-
-          const result =
-            await addStory(
-              formData,
-              token
-            );
-
-          if (!result.error) {
-
-            /* PUSH NOTIFICATION */
-
-            if (
-              Notification.permission ===
-              'granted'
-            ) {
-
-              new Notification(
-                'Story berhasil ditambahkan'
-              );
-            }
-
-            alert(
-              'Story berhasil ditambahkan'
-            );
-
-            window.location.hash =
-              '#/';
-
-          } else {
-
-            alert(
-              result.message
-            );
-          }
-
-        } catch (error) {
-
-          console.error(error);
-
-          alert(
-            'Gagal menambahkan story'
+            'lon',
+            selectedLon
           );
         }
+
+        const token =
+          localStorage.getItem(
+            'token'
+          );
+
+        const response =
+          await addStory(
+            formData,
+            token
+          );
+
+        Swal.close();
+
+        if (
+          response.error
+        ) {
+
+          Swal.fire(
+            'Gagal',
+            response.message,
+            'error'
+          );
+
+          return;
+        }
+
+        Swal.fire(
+          'Berhasil',
+          'Story berhasil ditambahkan',
+          'success'
+        );
+
+        window.location.hash =
+          '#/';
       }
     );
   },
