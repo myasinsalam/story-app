@@ -1,11 +1,19 @@
 import './styles/styles.css';
 
+import {
+  registerSW,
+} from 'virtual:pwa-register';
+
 import App from './scripts/pages/app.js';
 
 import {
   subscribeNotification,
   unsubscribeNotification,
 } from './scripts/data/api.js';
+
+registerSW({
+  immediate: true,
+});
 
 const VAPID_PUBLIC_KEY =
   'BCCs2eonMI-6H2ctvFaWg-UYdDv387Vno_bzUzALpB442r2lCnsHmtrx8biyPi_E-1fSGABK_Qs_GlvPoJJqxbk';
@@ -40,11 +48,7 @@ async function subscribeUser() {
   try {
 
     const registration =
-      await navigator.serviceWorker.register(
-        '/story-app/sw.js'
-      );
-
-    await navigator.serviceWorker.ready;
+      await navigator.serviceWorker.ready;
 
     console.log(
       'SW READY'
