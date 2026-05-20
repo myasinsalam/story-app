@@ -9,8 +9,6 @@ const urlsToCache = [
   './images/icon-512.png',
 ];
 
-/* INSTALL */
-
 self.addEventListener(
   'install',
   (event) => {
@@ -29,8 +27,6 @@ self.addEventListener(
     self.skipWaiting();
   }
 );
-
-/* ACTIVATE */
 
 self.addEventListener(
   'activate',
@@ -65,8 +61,6 @@ self.addEventListener(
   }
 );
 
-/* FETCH */
-
 self.addEventListener(
   'fetch',
   (event) => {
@@ -96,13 +90,11 @@ self.addEventListener(
   }
 );
 
-/* PUSH NOTIFICATION */
-
 self.addEventListener(
   'push',
   (event) => {
 
-    let data = {
+    let notificationData = {
       title: 'Story App',
       options: {
         body:
@@ -112,41 +104,45 @@ self.addEventListener(
 
     if (event.data) {
 
-      data =
-        event.data.json();
+      try {
+
+        const text =
+          event.data.text();
+
+        const data =
+          JSON.parse(text);
+
+        notificationData = {
+          title:
+            data.title ||
+            'Story App',
+
+          options: {
+            body:
+              data.options?.body ||
+              data.body ||
+              'Ada story baru!',
+          },
+        };
+
+      } catch (error) {
+
+        notificationData = {
+          title: 'Story App',
+
+          options: {
+            body:
+              event.data.text(),
+          },
+        };
+      }
     }
 
     event.waitUntil(
 
       self.registration.showNotification(
-        data.title,
-        {
-          body:
-            data.options.body,
-
-          icon:
-            './images/icon-192.png',
-
-          badge:
-            './images/icon-192.png',
-        }
-      )
-    );
-  }
-);
-
-/* NOTIFICATION CLICK */
-
-self.addEventListener(
-  'notificationclick',
-  (event) => {
-
-    event.notification.close();
-
-    event.waitUntil(
-
-      clients.openWindow(
-        './'
+        notificationData.title,
+        notificationData.options
       )
     );
   }
