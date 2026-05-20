@@ -224,19 +224,25 @@ const AddStoryPage = {
           const registration =
             await navigator.serviceWorker.ready;
 
-          registration.showNotification(
-            'Story App',
-            {
-              body:
-                'Story baru berhasil ditambahkan',
+          const subscription =
+            await registration.pushManager.getSubscription();
 
-              icon:
-                '/story-app/images/icon-192.png',
+          if (subscription) {
 
-              badge:
-                '/story-app/images/icon-192.png',
-            }
-          );
+            registration.showNotification(
+              'Story App',
+              {
+                body:
+                  'Story baru berhasil ditambahkan',
+
+                icon:
+                  '/story-app/images/icon-192.png',
+
+                badge:
+                  '/story-app/images/icon-192.png',
+              }
+            );
+          }
         }
 
         window.location.hash =
