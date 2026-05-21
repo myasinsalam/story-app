@@ -1,12 +1,11 @@
 {
   "name": "Story App",
   "short_name": "StoryApp",
-  "description": "Submission Dicoding",
+  "description": "Dicoding Story App",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#1976d2",
-  "orientation": "portrait",
+  "theme_color": "#8fd3ff",
   "icons": [
     {
       "src": "./images/icon-192.png",
