@@ -11,8 +11,24 @@ import {
   unsubscribeNotification,
 } from './scripts/data/api.js';
 
-registerSW({
+const updateSW = registerSW({
   immediate: true,
+
+  onRegistered(registration) {
+
+    console.log(
+      'SW REGISTERED:',
+      registration
+    );
+  },
+
+  onRegisterError(error) {
+
+    console.error(
+      'SW REGISTER ERROR:',
+      error
+    );
+  },
 });
 
 const VAPID_PUBLIC_KEY =
@@ -22,30 +38,61 @@ function urlBase64ToUint8Array(
   base64String
 ) {
 
-  const padding =
-    '='.repeat(
-      (4 - base64String.length % 4) % 4
+  try {
+
+    const padding =
+      '='.repeat(
+        (4 - base64String.length % 4) % 4
+      );
+
+    const base64 =
+      (base64String + padding)
+        .replace(/-/g, '+')
+        .replace(/_/g, '/');
+
+    const rawData =
+      window.atob(base64);
+
+    return Uint8Array.from(
+      [...rawData].map(
+        (char) =>
+          char.charCodeAt(0)
+      )
     );
 
-  const base64 =
-    (base64String + padding)
-      .replace(/-/g, '+')
-      .replace(/_/g, '/');
+  } catch (error) {
 
-  const rawData =
-    window.atob(base64);
+    console.error(
+      'VAPID ERROR:',
+      error
+    );
 
-  return Uint8Array.from(
-    [...rawData].map(
-      (char) =>
-        char.charCodeAt(0)
-    )
-  );
+    return null;
+  }
 }
 
 async function subscribeUser() {
 
   try {
+
+    if (
+      !('serviceWorker' in navigator)
+    ) {
+
+      alert(
+        'Service Worker tidak didukung'
+      );
+
+      return;
+    }
+
+    const registrations =
+      await navigator.serviceWorker.getRegistrations();
+
+    console.log(
+      'ALL SW:',
+      registrations
+    );
 
     const registration =
       await navigator.serviceWorker.ready;
@@ -65,12 +112,30 @@ async function subscribeUser() {
         'NOTIFICATION DENIED'
       );
 
+      alert(
+        'Izin notifikasi ditolak'
+      );
+
       return;
     }
 
     console.log(
       'NOTIFICATION GRANTED'
     );
+
+    const applicationServerKey =
+      urlBase64ToUint8Array(
+        VAPID_PUBLIC_KEY
+      );
+
+    if (!applicationServerKey) {
+
+      alert(
+        'VAPID KEY tidak valid'
+      );
+
+      return;
+    }
 
     let subscription =
       await registration.pushManager.getSubscription();
@@ -82,10 +147,7 @@ async function subscribeUser() {
           {
             userVisibleOnly: true,
 
-            applicationServerKey:
-              urlBase64ToUint8Array(
-                VAPID_PUBLIC_KEY
-              ),
+            applicationServerKey,
           }
         );
     }
@@ -104,6 +166,15 @@ async function subscribeUser() {
       'TOKEN:',
       token
     );
+
+    if (!token) {
+
+      alert(
+        'Silakan login terlebih dahulu'
+      );
+
+      return;
+    }
 
     const response =
       await subscribeNotification(
@@ -137,12 +208,22 @@ async function subscribeUser() {
       'SUBSCRIBE ERROR:',
       error
     );
+
+    alert(
+      'Subscribe gagal'
+    );
   }
 }
 
 async function unsubscribeUser() {
 
   try {
+
+    if (
+      !('serviceWorker' in navigator)
+    ) {
+      return;
+    }
 
     const registration =
       await navigator.serviceWorker.ready;
@@ -172,6 +253,7 @@ async function unsubscribeUser() {
   } catch (error) {
 
     console.error(
+      'UNSUBSCRIBE ERROR:',
       error
     );
   }
@@ -229,9 +311,14 @@ window.addEventListener(
   }
 );
 
-window.addEventListener(
+document.addEventListener(
   'click',
   async (event) => {
+
+    console.log(
+      'CLICK:',
+      event.target.id
+    );
 
     if (
       event.target.id ===
@@ -251,6 +338,10 @@ window.addEventListener(
       'subscribeButton'
     ) {
 
+      console.log(
+        'SUBSCRIBE BUTTON CLICKED'
+      );
+
       await subscribeUser();
     }
 
@@ -258,6 +349,10 @@ window.addEventListener(
       event.target.id ===
       'unsubscribeButton'
     ) {
+
+      console.log(
+        'UNSUBSCRIBE BUTTON CLICKED'
+      );
 
       await unsubscribeUser();
     }
