@@ -311,6 +311,16 @@ https://sweetalert2.github.io/#ajax-request`),eh(n),typeof n.title=="string"&&(n
 
         </form>
 
+        <p style="margin-top:16px;">
+
+          Sudah punya akun?
+
+          <a href="#/login">
+            Login di sini
+          </a>
+
+        </p>
+
       </section>
     `},async afterRender(){document.getElementById("registerForm").addEventListener("submit",async o=>{o.preventDefault(),J.fire({title:"Loading...",text:"Sedang register",allowOutsideClick:!1,didOpen:()=>{J.showLoading()}});const r=document.getElementById("name").value,c=document.getElementById("email").value,u=document.getElementById("password").value,f=await Ka(r,c,u);if(J.close(),f.error){J.fire("Gagal",f.message,"error");return}J.fire("Berhasil","Register berhasil","success"),window.location.hash="#/login"})}},fh={async render(){return`
       <section class="container">
