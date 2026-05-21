@@ -53,6 +53,16 @@ const RegisterPage = {
 
         </form>
 
+        <p style="margin-top:16px;">
+
+          Sudah punya akun?
+
+          <a href="#/login">
+            Login di sini
+          </a>
+
+        </p>
+
       </section>
     `;
   },
