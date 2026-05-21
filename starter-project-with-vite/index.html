@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-
   <meta charset="UTF-8" />
 
   <meta
@@ -10,72 +8,92 @@
     content="width=device-width, initial-scale=1.0"
   />
 
-  <meta
-    name="theme-color"
-    content="#ffffff"
-  />
-
-  <link
-    rel="manifest"
-    href="./manifest.json"
-  />
-
   <title>
     Story App
   </title>
+
+  <link
+    rel="manifest"
+    href="/story-app/manifest.webmanifest"
+  />
 
 </head>
 
 <body>
 
+  <a
+    href="#mainContent"
+    class="skip-link"
+  >
+    Skip to content
+  </a>
+
   <header>
 
-    <nav
-      style="
-        display:flex;
-        gap:12px;
-        align-items:center;
-        padding:16px;
-        flex-wrap:wrap;
-      "
-    >
+    <nav class="navbar">
 
-      <a href="#/">
-        Home
-      </a>
+      <h1>
+        Story App
+      </h1>
 
-      <a href="#/add-story">
-        Add Story
-      </a>
+      <ul class="nav-list">
 
-      <a href="#/bookmark">
-        Bookmark
-      </a>
+        <li>
+          <a href="#/">
+            Home
+          </a>
+        </li>
 
-      <button id="subscribeButton">
-        Subscribe
-      </button>
+        <li>
+          <a href="#/add-story">
+            Add Story
+          </a>
+        </li>
 
-      <button id="unsubscribeButton">
-        Unsubscribe
-      </button>
+        <li>
+          <a href="#/bookmark">
+            Bookmark
+          </a>
+        </li>
 
-      <button id="logoutButton">
-        Logout
-      </button>
+        <li>
+          <button id="subscribeButton">
+            Subscribe
+          </button>
+        </li>
+
+        <li>
+          <button id="unsubscribeButton">
+            Unsubscribe
+          </button>
+        </li>
+
+        <li>
+          <button id="logoutButton">
+            Logout
+          </button>
+        </li>
+
+      </ul>
 
     </nav>
 
   </header>
 
-  <main id="mainContent">
-  </main>
+  <main id="mainContent"></main>
+
+  <footer class="footer">
+
+    <p>
+      Story App Dicoding
+    </p>
+
+  </footer>
 
   <script
     type="module"
-    src="./src/main.js"
+    src="/src/main.js"
   ></script>
 
 </body>
-
 </html>

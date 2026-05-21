@@ -4,10 +4,18 @@
   box-sizing: border-box;
 }
 
+html,
+body {
+  height: 100%;
+}
+
 body {
   font-family: Arial, sans-serif;
   background-color: #f5f5f5;
   color: #222;
+
+  display: flex;
+  flex-direction: column;
 }
 
 /* SKIP LINK */
@@ -62,6 +70,7 @@ header {
   display: flex;
   gap: 20px;
   list-style: none;
+  align-items: center;
 }
 
 .nav-list a {
@@ -79,6 +88,10 @@ header {
 }
 
 /* MAIN */
+main {
+  flex: 1;
+}
+
 .main-content {
   padding-block: 30px;
 }
@@ -222,9 +235,10 @@ video {
 }
 
 /* FOOTER */
-footer {
+.footer {
   text-align: center;
-  padding: 30px 0;
+  padding: 20px;
+  background-color: #8fd3ff;
   margin-top: 40px;
 }
 
@@ -239,6 +253,7 @@ footer {
 
   .nav-list {
     gap: 12px;
+    flex-wrap: wrap;
   }
 
   .story-image {
