@@ -1,8 +1,6 @@
 import './styles/styles.css';
 
-import {
-  registerSW,
-} from 'virtual:pwa-register';
+import { registerSW } from 'virtual:pwa-register';
 
 import App from './scripts/pages/app.js';
 
@@ -11,350 +9,181 @@ import {
   unsubscribeNotification,
 } from './scripts/data/api.js';
 
-const updateSW = registerSW({
+registerSW({
   immediate: true,
-
   onRegistered(registration) {
-
-    console.log(
-      'SW REGISTERED:',
-      registration
-    );
+    console.log('SW REGISTERED:', registration);
   },
-
   onRegisterError(error) {
-
-    console.error(
-      'SW REGISTER ERROR:',
-      error
-    );
+    console.error('SW REGISTER ERROR:', error);
   },
 });
 
 const VAPID_PUBLIC_KEY =
   'BCCs2eonMI-6H2ctvFaWg-UYdDv387Vno_bzUzALpB442r2lCnsHmtrx8biyPi_E-1fSGABK_Qs_GlvPoJJqxbk';
 
-function urlBase64ToUint8Array(
-  base64String
-) {
-
+function urlBase64ToUint8Array(base64String) {
   try {
-
-    const padding =
-      '='.repeat(
-        (4 - base64String.length % 4) % 4
-      );
-
-    const base64 =
-      (base64String + padding)
-        .replace(/-/g, '+')
-        .replace(/_/g, '/');
-
-    const rawData =
-      window.atob(base64);
-
-    return Uint8Array.from(
-      [...rawData].map(
-        (char) =>
-          char.charCodeAt(0)
-      )
-    );
-
+    const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+    const base64 = (base64String + padding)
+      .replace(/-/g, '+')
+      .replace(/_/g, '/');
+    const rawData = window.atob(base64);
+    return Uint8Array.from([...rawData].map((char) => char.charCodeAt(0)));
   } catch (error) {
-
-    console.error(
-      'VAPID ERROR:',
-      error
-    );
-
+    console.error('VAPID ERROR:', error);
     return null;
   }
 }
 
+// ✅ FIX: Tunggu SW benar-benar siap dengan timeout agar tidak hang di lokal
+function waitForServiceWorker(timeoutMs = 10000) {
+  return Promise.race([
+    navigator.serviceWorker.ready,
+    new Promise((_, reject) =>
+      setTimeout(
+        () => reject(new Error('Service Worker timeout — coba refresh halaman')),
+        timeoutMs
+      )
+    ),
+  ]);
+}
+
 async function subscribeUser() {
-
   try {
-
-    if (
-      !('serviceWorker' in navigator)
-    ) {
-
-      alert(
-        'Service Worker tidak didukung'
-      );
-
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+      alert('Browser tidak mendukung Web Push Notification');
       return;
     }
 
-    const registrations =
-      await navigator.serviceWorker.getRegistrations();
-
-    console.log(
-      'ALL SW:',
-      registrations
-    );
-
-    const registration =
-      await navigator.serviceWorker.ready;
-
-    console.log(
-      'SW READY'
-    );
-
-    const permission =
-      await Notification.requestPermission();
-
-    if (
-      permission !== 'granted'
-    ) {
-
-      console.log(
-        'NOTIFICATION DENIED'
-      );
-
-      alert(
-        'Izin notifikasi ditolak'
-      );
-
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('Silakan login terlebih dahulu');
       return;
     }
 
-    console.log(
-      'NOTIFICATION GRANTED'
-    );
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+      alert('Izin notifikasi ditolak');
+      return;
+    }
 
-    const applicationServerKey =
-      urlBase64ToUint8Array(
-        VAPID_PUBLIC_KEY
-      );
+    // ✅ FIX: Gunakan waitForServiceWorker dengan timeout agar tidak hang di lokal
+    let registration;
+    try {
+      registration = await waitForServiceWorker();
+    } catch (e) {
+      alert(e.message);
+      return;
+    }
 
+    console.log('SW READY:', registration);
+
+    const applicationServerKey = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
     if (!applicationServerKey) {
-
-      alert(
-        'VAPID KEY tidak valid'
-      );
-
+      alert('VAPID KEY tidak valid');
       return;
     }
 
-    let subscription =
-      await registration.pushManager.getSubscription();
+    let subscription = await registration.pushManager.getSubscription();
 
     if (!subscription) {
-
-      subscription =
-        await registration.pushManager.subscribe(
-          {
-            userVisibleOnly: true,
-
-            applicationServerKey,
-          }
-        );
+      subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey,
+      });
     }
 
-    console.log(
-      'SUBSCRIPTION:',
-      subscription
-    );
+    console.log('SUBSCRIPTION:', subscription);
 
-    const token =
-      localStorage.getItem(
-        'token'
-      );
-
-    console.log(
-      'TOKEN:',
+    const response = await subscribeNotification(
+      {
+        endpoint: subscription.endpoint,
+        keys: {
+          p256dh: subscription.toJSON().keys.p256dh,
+          auth: subscription.toJSON().keys.auth,
+        },
+      },
       token
     );
 
-    if (!token) {
+    console.log('POST RESPONSE:', response);
 
-      alert(
-        'Silakan login terlebih dahulu'
-      );
-
-      return;
+    if (response.error) {
+      throw new Error(response.message || 'Gagal subscribe ke server');
     }
 
-    const response =
-      await subscribeNotification(
-        {
-          endpoint:
-            subscription.endpoint,
-
-          keys: {
-            p256dh:
-              subscription.toJSON().keys.p256dh,
-
-            auth:
-              subscription.toJSON().keys.auth,
-          },
-        },
-        token
-      );
-
-    console.log(
-      'POST RESPONSE:',
-      response
-    );
-
-    alert(
-      'Subscribe berhasil'
-    );
-
+    alert('Subscribe berhasil!');
   } catch (error) {
-
-    console.error(
-      'SUBSCRIBE ERROR:',
-      error
-    );
-
-    alert(
-      'Subscribe gagal'
-    );
+    console.error('SUBSCRIBE ERROR:', error);
+    alert(`Subscribe gagal: ${error.message}`);
   }
 }
 
 async function unsubscribeUser() {
-
   try {
+    if (!('serviceWorker' in navigator)) return;
 
-    if (
-      !('serviceWorker' in navigator)
-    ) {
+    const token = localStorage.getItem('token');
+
+    let registration;
+    try {
+      registration = await waitForServiceWorker();
+    } catch (e) {
+      alert(e.message);
       return;
     }
 
-    const registration =
-      await navigator.serviceWorker.ready;
-
-    const subscription =
-      await registration.pushManager.getSubscription();
+    const subscription = await registration.pushManager.getSubscription();
 
     if (subscription) {
-
-      const token =
-        localStorage.getItem(
-          'token'
-        );
-
-      await unsubscribeNotification(
-        subscription.endpoint,
-        token
-      );
-
+      await unsubscribeNotification(subscription.endpoint, token);
       await subscription.unsubscribe();
-
-      alert(
-        'Unsubscribe berhasil'
-      );
+      alert('Unsubscribe berhasil');
+    } else {
+      alert('Tidak ada subscription aktif');
     }
-
   } catch (error) {
-
-    console.error(
-      'UNSUBSCRIBE ERROR:',
-      error
-    );
+    console.error('UNSUBSCRIBE ERROR:', error);
+    alert(`Unsubscribe gagal: ${error.message}`);
   }
 }
 
 const app = new App({
-  content:
-    document.querySelector(
-      '#mainContent'
-    ),
+  content: document.querySelector('#mainContent'),
 });
 
 function updateNavbar() {
-
-  const path =
-    window.location.hash;
-
-  const header =
-    document.querySelector(
-      'header'
-    );
-
-  if (
-    path === '#/login' ||
-    path === '#/register'
-  ) {
-
-    header.style.display =
-      'none';
-
+  const path = window.location.hash;
+  const header = document.querySelector('header');
+  if (path === '#/login' || path === '#/register') {
+    header.style.display = 'none';
   } else {
-
-    header.style.display =
-      'block';
+    header.style.display = 'block';
   }
 }
 
-window.addEventListener(
-  'hashchange',
-  async () => {
+window.addEventListener('hashchange', async () => {
+  updateNavbar();
+  await app.renderPage();
+});
 
-    updateNavbar();
+window.addEventListener('load', async () => {
+  updateNavbar();
+  await app.renderPage();
+});
 
-    await app.renderPage();
+document.addEventListener('click', async (event) => {
+  if (event.target.id === 'logoutButton') {
+    localStorage.removeItem('token');
+    window.location.hash = '#/login';
   }
-);
 
-window.addEventListener(
-  'load',
-  async () => {
-
-    updateNavbar();
-
-    await app.renderPage();
+  if (event.target.id === 'subscribeButton') {
+    await subscribeUser();
   }
-);
 
-document.addEventListener(
-  'click',
-  async (event) => {
-
-    console.log(
-      'CLICK:',
-      event.target.id
-    );
-
-    if (
-      event.target.id ===
-      'logoutButton'
-    ) {
-
-      localStorage.removeItem(
-        'token'
-      );
-
-      window.location.hash =
-        '#/login';
-    }
-
-    if (
-      event.target.id ===
-      'subscribeButton'
-    ) {
-
-      console.log(
-        'SUBSCRIBE BUTTON CLICKED'
-      );
-
-      await subscribeUser();
-    }
-
-    if (
-      event.target.id ===
-      'unsubscribeButton'
-    ) {
-
-      console.log(
-        'UNSUBSCRIBE BUTTON CLICKED'
-      );
-
-      await unsubscribeUser();
-    }
+  if (event.target.id === 'unsubscribeButton') {
+    await unsubscribeUser();
   }
-);
+});
