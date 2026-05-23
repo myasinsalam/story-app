@@ -8,16 +8,13 @@ import { CacheableResponsePlugin } from 'workbox-cacheable-response';
 self.skipWaiting();
 clientsClaim();
 
-// ─── Precache (otomatis diisi oleh VitePWA saat build) ──────────────────────
 precacheAndRoute(self.__WB_MANIFEST);
 cleanupOutdatedCaches();
 
-// ─── Navigation Route ────────────────────────────────────────────────────────
 registerRoute(
   new NavigationRoute(createHandlerBoundToURL('index.html'))
 );
 
-// ─── Runtime Caching: Dicoding Story API ────────────────────────────────────
 registerRoute(
   /^https:\/\/story-api\.dicoding\.dev\/v1\/stories/,
   new NetworkFirst({
@@ -30,7 +27,6 @@ registerRoute(
   'GET'
 );
 
-// ─── Runtime Caching: OpenStreetMap tiles ───────────────────────────────────
 registerRoute(
   /^https:\/\/tile\.openstreetmap\.org/,
   new CacheFirst({
@@ -43,7 +39,6 @@ registerRoute(
   'GET'
 );
 
-// ─── Web Push: event push ────────────────────────────────────────────────────
 self.addEventListener('push', (event) => {
   let data = {
     title: 'Story App',
@@ -67,7 +62,6 @@ self.addEventListener('push', (event) => {
         },
       };
     } catch {
-      // Jika payload bukan JSON, tampilkan sebagai teks biasa
       data.options.body = event.data.text();
     }
   }
@@ -77,7 +71,6 @@ self.addEventListener('push', (event) => {
   );
 });
 
-// ─── Web Push: event notificationclick ──────────────────────────────────────
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 

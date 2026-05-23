@@ -88,8 +88,6 @@ const HomePage = {
       }
     });
 
-    // ✅ FIX: Gunakan Map (id => story) agar pencarian tidak tergantung
-    //         perbandingan tipe data (string vs number dari dataset.id)
     const storyMap = new Map(
       result.listStory.map((story) => [String(story.id), story])
     );
