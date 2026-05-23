@@ -13,9 +13,9 @@ const AddStoryPage = {
     return `
       <section class="container">
 
-        <h1>
+        <h2>
           Add Story
-        </h1>
+        </h2>
 
         <form id="addStoryForm">
 

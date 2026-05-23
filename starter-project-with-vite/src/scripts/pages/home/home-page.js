@@ -30,9 +30,9 @@ const HomePage = {
     return `
       <section class="container">
 
-        <h1>
+        <h2>
           Daftar Story
-        </h1>
+        </h2>
 
         <div
           id="map"
@@ -133,9 +133,9 @@ const HomePage = {
               "
             >
 
-              <h2>
+              <h3>
                 ${story.name}
-              </h2>
+              </h3>
 
               <p>
                 ${story.description}

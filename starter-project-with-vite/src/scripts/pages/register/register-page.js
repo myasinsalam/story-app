@@ -11,9 +11,9 @@ const RegisterPage = {
     return `
       <section class="auth-container">
 
-        <h1>
+        <h2>
           Register
-        </h1>
+        </h2>
 
         <form id="registerForm">
 

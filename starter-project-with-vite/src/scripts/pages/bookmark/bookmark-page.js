@@ -10,9 +10,9 @@ const BookmarkPage = {
     return `
       <section class="container">
 
-        <h1>
+        <h2>
           Bookmark Story
-        </h1>
+        </h2>
 
         <div
           id="bookmarkStories"
