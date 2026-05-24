@@ -167,9 +167,9 @@ https://sweetalert2.github.io/#ajax-request`),ih(n),typeof n.title=="string"&&(n
     `},async afterRender(){const n=document.getElementById("addStoryForm"),o=document.getElementById("photo");let r=null,l=null;const u=Ft.map("map").setView([-6.2,106.816666],5);Ft.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"&copy; OpenStreetMap contributors"}).addTo(u);let f;u.on("click",p=>{r=p.latlng.lat,l=p.latlng.lng,f?f.setLatLng(p.latlng):f=Ft.marker(p.latlng).addTo(u)}),n.addEventListener("submit",async p=>{p.preventDefault(),J.fire({title:"Loading...",text:"Sedang menambah story",allowOutsideClick:!1,didOpen:()=>{J.showLoading()}});const v=document.getElementById("description").value,w=o.files[0],M=new FormData;M.append("description",v),M.append("photo",w),r&&l&&(M.append("lat",r),M.append("lon",l));const U=localStorage.getItem("token"),O=await Qa(M,U);if(J.close(),O.error){J.fire("Gagal",O.message,"error");return}if(J.fire("Berhasil","Story berhasil ditambahkan","success"),"serviceWorker"in navigator){const S=await navigator.serviceWorker.ready;await S.pushManager.getSubscription()&&S.showNotification("Story App",{body:"Story baru berhasil ditambahkan",icon:"/story-app/images/icon-192.png",badge:"/story-app/images/icon-192.png"})}window.location.hash="#/"})}},dh={async render(){return`
       <section class="auth-container">
 
-        <h2>
+        <h1>
           Login
-        </h2>
+        </h1>
 
         <form id="loginForm">
 
@@ -213,9 +213,9 @@ https://sweetalert2.github.io/#ajax-request`),ih(n),typeof n.title=="string"&&(n
     `},async afterRender(){document.getElementById("loginForm").addEventListener("submit",async o=>{o.preventDefault(),J.fire({title:"Loading...",text:"Sedang login",allowOutsideClick:!1,didOpen:()=>{J.showLoading()}});const r=document.getElementById("email").value,l=document.getElementById("password").value,u=await Xa(r,l);if(J.close(),u.error){J.fire("Gagal",u.message,"error");return}localStorage.setItem("token",u.loginResult.token),J.fire("Berhasil","Login berhasil","success"),window.location.hash="#/"})}},fh={async render(){return`
       <section class="auth-container">
 
-        <h2>
+        <h1>
           Register
-        </h2>
+        </h1>
 
         <form id="registerForm">
 
