@@ -11,9 +11,9 @@ const LoginPage = {
     return `
       <section class="auth-container">
 
-        <h2>
+        <h1>
           Login
-        </h2>
+        </h1>
 
         <form id="loginForm">
 
